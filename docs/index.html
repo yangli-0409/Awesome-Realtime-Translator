@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面试实时字幕 · M1 交付报告</title>
+<style>
+:root{
+  --bg:#0f1115; --card:#171a21; --line:#272b35; --fg:#e6e8ec; --dim:#9aa3b2;
+  --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --accent:#60a5fa;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+h1{font-size:28px;margin:0 0 6px;letter-spacing:-.3px}
+.sub{color:var(--dim);margin:0 0 36px;font-size:14px}
+h2{font-size:19px;margin:44px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+h3{font-size:15px;margin:26px 0 8px;color:var(--accent)}
+p{margin:10px 0}
+code{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:#0b0d11;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+pre{background:#0b0d11;border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:none;padding:0}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--dim);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card .n{font-size:24px;font-weight:650;letter-spacing:-.5px}
+.card .l{color:var(--dim);font-size:12px;margin-top:2px}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:99px;border:1px solid;margin-right:6px}
+.t-ok{color:var(--ok);border-color:#1f4d33;background:#0f2619}
+.t-warn{color:var(--warn);border-color:#4d3c13;background:#261d08}
+.t-bad{color:var(--bad);border-color:#4d2222;background:#260f0f}
+ul{margin:10px 0;padding-left:22px}
+li{margin:5px 0}
+.flow{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;
+  font:13px/1.9 ui-monospace,Menlo,monospace;color:var(--dim);overflow-x:auto;white-space:pre}
+.note{border-left:3px solid var(--accent);background:#141821;padding:12px 16px;margin:16px 0;border-radius:0 8px 8px 0}
+.note.w{border-color:var(--warn)}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>面试实时字幕 · M1 交付报告</h1>
+<p class="sub">Awesome-Realtime-Translator · 2026-11-10 · 对应 PRD 第 9 节「给 Claude Code 的执行指令」</p>
+
+<div class="cards">
+  <div class="card"><div class="n">F1–F9</div><div class="l">已实现功能点（M1 要求 F1–F6）</div></div>
+  <div class="card"><div class="n">22 / 22</div><div class="l">Segmenter 单元测试通过</div></div>
+  <div class="card"><div class="n">3</div><div class="l">被测试逮出来的真实 bug</div></div>
+  <div class="card"><div class="n">Swift 6</div><div class="l">完全并发检查下零错误</div></div>
+</div>
+
+<h2>一、PRD 技术假设的核实结果</h2>
+<p>核实方式不是查网页，而是直接读 SDK 26.5 里的 <code>.swiftinterface</code>——带 <code>@available</code> 标注，比文档权威。</p>
+
+<table>
+<tr><th>PRD 的假设</th><th>实测</th><th>处理</th></tr>
+<tr>
+  <td>macOS 15 + Translation 框架即可</td>
+  <td><span class="tag t-bad">错</span><code>TranslationSession(installedSource:target:)</code> 标注 <code>@available(macOS 26.0, *)</code>。macOS 15 上唯一拿到会话的途径是 SwiftUI <code>.translationTask</code>，非 UI 层拿不到</td>
+  <td>部署目标定 macOS 26.0</td>
+</tr>
+<tr>
+  <td>7.4 #2：识别任务会在停顿后结束，需要无缝续接且不丢音频</td>
+  <td><span class="tag t-ok">已消失</span>这是 <code>SFSpeechRecognizer</code> 的模型。<code>SpeechAnalyzer</code> 是常驻 actor，输入是永不结束的 AsyncSequence，没有「会话时长」概念</td>
+  <td>不写重启逻辑，F3 该条验收标准作废</td>
+</tr>
+<tr>
+  <td>F11：术语表作为「识别器的提示词」</td>
+  <td><span class="tag t-warn">换入口</span>官方入口是 <code>AnalysisContext.contextualStrings</code>，模型在解码阶段加权，比拼 prompt 可靠</td>
+  <td>数据通路已接好，缺编辑 UI</td>
+</tr>
+<tr>
+  <td>7.4 #3：SCStream 输出格式与识别器不一致，需要 AVAudioConverter</td>
+  <td><span class="tag t-ok">确认</span>需要。<code>SpeechAnalyzer.bestAvailableAudioFormat</code> 给目标格式</td>
+  <td>转换放在采集队列上，不占识别线程</td>
+</tr>
+<tr>
+  <td>7.4 #5：屏幕录制权限授予后需重启进程</td>
+  <td><span class="tag t-ok">确认</span>TCC 判定在进程启动时缓存</td>
+  <td>引导页写明，并提供「立即重启」按钮</td>
+</tr>
+<tr>
+  <td>ScreenCaptureKit 能排除本进程音频</td>
+  <td><span class="tag t-ok">确认</span><code>excludesCurrentProcessAudio</code>（macOS 13+）</td>
+  <td>同时把本应用窗口从内容过滤器排除，双保险</td>
+</tr>
+</table>
+
+<h2>二、架构</h2>
+<div class="flow">SystemAudioCapture ──PCM──► SpeechAnalyzerTranscriber
+  (ScreenCaptureKit)              │ TranscriptEvent (.volatile / .finalized)
+                                  ▼
+                              Segmenter  ← 纯逻辑，22 个单测
+                                  │ Sentence（定稿后不可变）
+                                  ▼
+                          翻译串行队列（Translator 协议）
+                                  │
+                                  ▼
+              CaptionStore (@Observable) ──► CaptionPanel (NSPanel)</div>
+
+<h3>两条反闪烁规则（PRD 7.4 #1）</h3>
+<ul>
+  <li>原文区 = 已定稿句子 + 当前未定稿尾句。只有最后一行会变。</li>
+  <li>译文<strong>只</strong>对已定稿句子生成，走串行队列保证顺序，一旦出现不再改写。</li>
+</ul>
+
+<h3>断句的三条定稿规则</h3>
+<ul>
+  <li>句末标点——但排除缩写（<code>Dr.</code>）、小数（<code>1.5</code>）、人名缩写（<code>J. Smith</code>）、句中省略号（<code>Well... it depends</code>）</li>
+  <li>静音超过 450ms</li>
+  <li>单句超过 140 字符时在词边界硬切（防止面试官一口气说三分钟导致整段不出译文）</li>
+</ul>
+
+<h2>三、PRD §10 未决问题的决定</h2>
+<table>
+<tr><th>问题</th><th>决定</th><th>理由</th></tr>
+<tr><td>最低系统版本</td><td><strong>macOS 26</strong></td><td>换来直接可用的 TranslationSession 和 SpeechAnalyzer，砍掉两类难点和一半代码。代价是放弃 macOS 15 用户</td></tr>
+<tr><td>屏幕共享时隐藏字幕窗</td><td><strong>做了，默认开</strong></td><td><code>NSWindow.sharingType = .none</code>。不检测共享状态——窗口对所有录屏 API 从源头不可见，自己照常看得见</td></tr>
+<tr><td>会话记录默认行为</td><td><strong>默认不保存</strong></td><td>面试记录含对方可识别信息，默认留痕不友好。想复盘自己开；当前这场随时能复制/导出</td></tr>
+<tr><td>首发语言对</td><td>英→中已接通，法/德/日/西在 UI 里未实测</td><td>加语言只是改 identifier</td></tr>
+<tr><td>产品名称 / 定价 / 免费限时</td><td><strong>没做</strong>，代码里零计时零内购</td><td>定价要先做竞品调研，PRD 自己也列为待办</td></tr>
+</table>
+
+<h2>四、已验证 / 未验证</h2>
+<div class="note">
+<strong>已验证</strong>
+<ul>
+  <li>Swift 6 <code>SWIFT_STRICT_CONCURRENCY=complete</code> 下零错误编译</li>
+  <li>22 个 Segmenter 单测全过。其中 3 个真实 bug 是测试逮出来的：<code>no.</code> 被误判成缩写、省略号后切不开、切句残留前导空格</li>
+  <li>Release 打包成 .app，启动后进程存活、无崩溃报告、菜单栏图标正常</li>
+</ul>
+</div>
+<div class="note w">
+<strong>未验证——需要在你本机跑一次</strong>
+<ul>
+  <li><strong>系统音频实际有没有抓到声音。</strong>ScreenCaptureKit 需要 TCC 授权，必须你点同意，这是最大的未验证风险点</li>
+  <li>识别准确率、端到端延迟（目标 &lt;1s，译文 &lt;1.5s）</li>
+  <li>翻译语言包未安装时的下载流程</li>
+  <li>60 分钟连续运行的稳定性与 CPU 占用（目标 &lt;30% 单核）</li>
+  <li>插拔耳机 / 切换输出设备后的自动恢复（有 <code>didStopWithError</code> 重启 + 12 秒无音频看门狗，逻辑未实测）</li>
+  <li>中文作为<strong>源</strong>语言的识别效果</li>
+  <li>「语音识别无需单独授权」这个结论；若实测仍弹 Siri 授权框，改 <code>Permissions.speechRecognitionState</code> 读 <code>legacySpeechState</code> 即可</li>
+</ul>
+</div>
+
+<h2>五、最小验证步骤</h2>
+<p>不用开 Zoom。<code>say</code> 是独立进程，会被系统音频采集到：</p>
+<pre><code>say -v Samantha "Tell me about your experience with distributed systems. How many nodes did you run in production?"</code></pre>
+<p>预期：原文边说边出字，句末标点处定稿，下面出现中文译文，译文出现后不再改写。</p>
+
+<h2>六、隐私是技术约束，不是承诺</h2>
+<ul>
+  <li><code>.entitlements</code> 里<strong>没有</strong> <code>com.apple.security.network.client</code>——沙盒从系统层面阻断任何出网请求</li>
+  <li>音频只在内存里流过识别器，不写文件，没有录音代码路径</li>
+  <li>字幕窗不会出现在任何录屏或共享画面里</li>
+</ul>
+
+<footer>
+构建：<code>xcodegen generate &amp;&amp; xcodebuild -scheme AwesomeRealtimeTranslator -destination 'platform=macOS' test</code><br>
+完整说明见仓库 README.md。按 PRD §9 要求，M1 到此停下等确认，再继续 M2。
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- 故意不声明 network.client：沙盒会直接阻断任何出网请求，
+	     这是「默认零网络请求」这条非功能需求的技术保证，而不是口头承诺。
+	     v1.1 做 BYOK 翻译时再按需打开，并在设置页明示。 -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+</dict>
+</plist>
