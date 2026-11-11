@@ -1,0 +1,66 @@
+name: AwesomeRealtimeTranslator
+options:
+  bundleIdPrefix: com.leon
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_HARDENED_RUNTIME: YES
+    DEAD_CODE_STRIPPING: YES
+    GCC_WARN_INHIBIT_ALL_WARNINGS: NO
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+
+targets:
+  AwesomeRealtimeTranslator:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/AwesomeRealtimeTranslator
+        excludes:
+          - "Info.plist"
+          - "AwesomeRealtimeTranslator.entitlements"
+    settings:
+      base:
+        PRODUCT_NAME: AwesomeRealtimeTranslator
+        PRODUCT_BUNDLE_IDENTIFIER: com.leon.AwesomeRealtimeTranslator
+        INFOPLIST_FILE: Sources/AwesomeRealtimeTranslator/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/AwesomeRealtimeTranslator/AwesomeRealtimeTranslator.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        COMBINE_HIDPI_IMAGES: YES
+        LD_RUNPATH_SEARCH_PATHS: ["$(inherited)", "@executable_path/../Frameworks"]
+    frameworks: []
+
+  # 纯逻辑测试：不挂宿主 App，直接把被测源文件编进测试 bundle，
+  # 这样 `xcodebuild test` 不需要启动 GUI 应用。
+  AwesomeRealtimeTranslatorTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests/AwesomeRealtimeTranslatorTests
+      - path: Sources/AwesomeRealtimeTranslator/Segmentation/Segmenter.swift
+      - path: Sources/AwesomeRealtimeTranslator/Transcription/Transcriber.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.leon.AwesomeRealtimeTranslatorTests
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  AwesomeRealtimeTranslator:
+    build:
+      targets:
+        AwesomeRealtimeTranslator: all
+        AwesomeRealtimeTranslatorTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - AwesomeRealtimeTranslatorTests
