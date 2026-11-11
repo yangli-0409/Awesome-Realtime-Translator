@@ -409,3 +409,7 @@ SystemAudioCapture ──PCM──► SpeechAnalyzerTranscriber ──Transcript
 - 字幕窗 `sharingType = .none`，不会出现在任何录屏或共享画面里。
 
 以后做 BYOK 翻译（F12）必须打开网络权限，届时要在设置页明确提示，并且默认关闭。
+
+## 八、许可证
+
+[MIT](LICENSE)。

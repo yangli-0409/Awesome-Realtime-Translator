@@ -478,4 +478,4 @@ happens it must be stated explicitly in settings and default to off.
 
 ## License
 
-Not yet chosen. Until one is added, no permissions are granted beyond reading the source.
+[MIT](LICENSE).
