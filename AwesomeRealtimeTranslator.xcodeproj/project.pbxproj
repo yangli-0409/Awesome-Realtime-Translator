@@ -29,6 +29,7 @@
 		E3784E17D4DA5E08CD66BD28 /* SpeechAnalyzerTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE2B2B4F193877448D39895 /* SpeechAnalyzerTranscriber.swift */; };
 		E3C03ECD74F84BC3309F0909 /* CaptionPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FB59068657D6E9B54D0B97 /* CaptionPanelController.swift */; };
 		E60407CBE8960BF6392B9E86 /* SessionArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4D1F7B13CCE03ABB7834CB8 /* SessionArchive.swift */; };
+		E7FEABB13F63403ACEC1B25D /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 65C241385442433167F784C9 /* AppIcon.icns */; };
 		E8DA5E9A0242C346402AB636 /* AudioSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9336D68C5646D3A3B4526F8B /* AudioSource.swift */; };
 		EA0AF8D4384194E42739150A /* AwesomeRealtimeTranslatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6CEE58394A268C9F050857 /* AwesomeRealtimeTranslatorApp.swift */; };
 		EE0BF5E089B619134BE1A5F6 /* CaptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10B27AE97BBE0ED7A32484C /* CaptionView.swift */; };
@@ -45,6 +46,7 @@
 		3B937985CC362EEFAEA50950 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
 		4D8FE84B9D44B9EEAEC3E939 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		639F302452EDF58341F3C139 /* Translator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Translator.swift; sourceTree = "<group>"; };
+		65C241385442433167F784C9 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		6B2F0861DDC32A69452A1C3D /* AwesomeRealtimeTranslator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AwesomeRealtimeTranslator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		70DF7F8AB950944E709D3CC7 /* StreamingText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingText.swift; sourceTree = "<group>"; };
 		814E99D79545E7E924051060 /* Transcriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transcriber.swift; sourceTree = "<group>"; };
@@ -130,6 +132,14 @@
 			path = Caption;
 			sourceTree = "<group>";
 		};
+		B4A1BB5F58496A4D1E2859A4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				65C241385442433167F784C9 /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		BBEAFD7B14385F64DE4D9C06 /* Segmentation */ = {
 			isa = PBXGroup;
 			children = (
@@ -192,6 +202,7 @@
 				7D4AA279620FE9544C1DB3BF /* Audio */,
 				AA35B407C2FF987DE73C90A3 /* Caption */,
 				0F88000CE69291015357DBB5 /* Permissions */,
+				B4A1BB5F58496A4D1E2859A4 /* Resources */,
 				BBEAFD7B14385F64DE4D9C06 /* Segmentation */,
 				DF3DA73A0CE500D7686FBD70 /* Settings */,
 				FE7CFB6B596B82DEA57793DD /* Support */,
@@ -217,6 +228,7 @@
 			buildConfigurationList = D00576F5E5680E13532306A4 /* Build configuration list for PBXNativeTarget "AwesomeRealtimeTranslator" */;
 			buildPhases = (
 				580A5E38764142A2FFE3C3A1 /* Sources */,
+				619AEFDB498E8B28481F1DB9 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -282,6 +294,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		619AEFDB498E8B28481F1DB9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7FEABB13F63403ACEC1B25D /* AppIcon.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		580A5E38764142A2FFE3C3A1 /* Sources */ = {
