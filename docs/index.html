@@ -102,11 +102,6 @@ ol.steps li::before{
 }
 ol.steps b{display:block;margin-bottom:2px}
 ol.steps p{margin:0;color:var(--muted);font-size:14.5px}
-pre{
-  background:var(--surface-2);border:1px solid var(--line);border-radius:9px;
-  padding:11px 13px;overflow-x:auto;margin:10px 0 0;
-  font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cfe3d8;
-}
 
 /* 表格 */
 table{width:100%;border-collapse:collapse;font-size:14.5px}
@@ -160,7 +155,7 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
     <div class="cta">
       <a class="btn" href="AwesomeRealtimeTranslator-0.1.0.zip">下载 macOS 版</a>
-      <a class="btn ghost" href="report.html">看技术细节</a>
+      <a class="btn ghost" href="#install">怎么装</a>
     </div>
     <p class="meta">
       v0.1.0 · 2026-11-10 · <b>需要 macOS 26 及以上</b> · Apple 芯片 / Intel 通用 · 0.8 MB
@@ -171,7 +166,7 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 <section>
   <div class="wrap">
     <h2>你看得见，对方看不见</h2>
-    <p class="sub">字幕窗的 <code style="color:var(--accent)">sharingType = .none</code>，对所有录屏和屏幕共享 API 都不可见——不是「检测到共享就隐藏」，是从源头上就录不进去。</p>
+    <p class="sub">字幕窗不会出现在任何录屏和屏幕共享的画面里。不是「检测到你在共享就自动躲起来」，是它从一开始就录不进去——你共享整个桌面也一样。</p>
 
     <div class="compare">
       <div class="pane">
@@ -206,27 +201,27 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
       <div class="card">
         <span class="pill">实时</span>
         <h3>边听边出字</h3>
-        <p>原文逐词推进，整句说完才生成译文——译文一旦出现就不再改写，不会在你眼前反复跳。</p>
+        <p>原文一个词一个词往前推，整句说完才给译文。译文一旦出现就不再改写，不会在你眼前反复跳。</p>
       </div>
       <div class="card">
         <span class="pill">本机</span>
-        <h3>一次网络请求都没有</h3>
-        <p>识别和翻译都用 macOS 自带的本机模型。沙盒里<b>没有申请网络权限</b>，这是技术上的保证，不是口头承诺。</p>
+        <h3>全程不联网</h3>
+        <p>听写和翻译都用你这台 Mac 自己的能力完成。它<b>没有联网的能力</b>，断网也照样工作——这不是承诺，是它本来就做不到。</p>
       </div>
       <div class="card">
-        <span class="pill">隐蔽</span>
-        <h3>不抢焦点、不进 Dock</h3>
-        <p>字幕窗不接受键盘焦点，你在 Zoom 里打字不会被打断。没有 Dock 图标，可选鼠标穿透。</p>
+        <span class="pill">不打扰</span>
+        <h3>不抢焦点，不占 Dock</h3>
+        <p>你在会议软件里打字不会被打断。没有 Dock 图标，可以开鼠标穿透当它不存在，别的应用全屏时它也还在最上层。</p>
       </div>
       <div class="card">
         <span class="pill">不留痕</span>
-        <h3>不录音、不落盘</h3>
-        <p>音频只在内存里过一遍就丢掉，任何时候都不写文件。文字记录默认也不保存，想留要自己打开。</p>
+        <h3>不录音，不存文件</h3>
+        <p>声音听过就丢，任何时候都不写进硬盘。文字默认也不保存；真想留，可以一键复制或导出这一场的中英对照。</p>
       </div>
       <div class="card">
         <span class="pill">可调</span>
-        <h3>出字节奏你说了算</h3>
-        <p>滑块在 0.3~1.0 秒之间调：跟手一点会看到字一跳一跳，顺滑一点就要多等半秒。</p>
+        <h3>看着顺眼为止</h3>
+        <p>三种显示模式（双语 / 只看原文 / 只看译文）、字号、透明度、显示行数、出字快慢，都在设置里拖滑块。</p>
       </div>
       <div class="card">
         <span class="pill">克制</span>
@@ -239,43 +234,41 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
 <section>
   <div class="wrap">
-    <h2>延迟是多少，有实测</h2>
-    <p class="sub">不说「极速」「毫秒级」这种话。下面是埋点量出来的真实数字。</p>
+    <h2>有多快</h2>
+    <p class="sub">不说「极速」「零延迟」这种话，给个你能对得上的数。</p>
 
-    <table>
-      <thead><tr><th>环节</th><th>实测</th><th>说明</th></tr></thead>
-      <tbody>
-        <tr><td>系统音频采集</td><td><code>21ms</code> 一块</td><td>不是瓶颈</td></tr>
-        <tr><td>语音识别吐字</td><td>每 <code>~950ms</code> 一批</td><td>模型的解码窗口，改不了</td></tr>
-        <tr><td>字幕显现节奏</td><td><code>0.5s</code>（可调）</td><td>把一批字摊开匀速放，避免一跳一跳</td></tr>
-        <tr><td><b>端到端</b></td><td><b>约 1.5 秒</b></td><td>对方说完一句到你看到译文</td></tr>
-      </tbody>
-    </table>
+    <ul class="limits">
+      <li><b>原文落后对方约一秒。</b>他说到第五个词的时候，你大概看到第二三个词。</li>
+      <li><b>译文在他说完一句之后约半秒出现。</b>算下来，从他说完到你看懂，大约 <b>1.5 秒</b>。</li>
+      <li><b>这个速度是苹果的听写能力决定的</b>，不是软件偷懒，也不会因为换台更贵的 Mac 变快。</li>
+    </ul>
+    <p class="sub" style="margin:26px 0 0">
+      实际用起来的感受是：对方正常语速讲话时，字幕是连续往前流的，不会一段一段跳。
+      他讲完一句你低头看译文的那半秒，刚好是你准备开口的半秒。
+    </p>
   </div>
 </section>
 
 <section>
   <div class="wrap">
-    <h2>安装</h2>
-    <p class="sub">大约两分钟。授权之后需要重启一次应用，这是 macOS 的行为，不是故障。</p>
+    <h2 id="install">安装</h2>
+    <p class="sub">大约两分钟。中间会让你重启一次应用，这是 macOS 的正常流程，不是出错了。</p>
 
     <ol class="steps">
       <li>
         <b>下载解压，拖进「应用程序」</b>
-        <p>解压得到 AwesomeRealtimeTranslator.app。</p>
       </li>
       <li>
-        <b>首次打开：绕过「无法验证开发者」</b>
-        <p>这个应用是 ad-hoc 签名的，没有苹果开发者证书，所以 Gatekeeper 会拦。在 Finder 里<b>右键点图标 → 打开</b>，或者在终端运行一次：</p>
-        <pre>xattr -dr com.apple.quarantine /Applications/AwesomeRealtimeTranslator.app</pre>
+        <b>第一次打开用右键</b>
+        <p>系统会说「无法验证开发者」，因为我没有买苹果的开发者证书。在「应用程序」里<b>右键点它 → 选「打开」</b>，再确认一次就好。只需要这么做一次。</p>
       </li>
       <li>
-        <b>给「屏幕与系统音频录制」权限</b>
-        <p>macOS 把「采集系统声音」归在这一项权限下。应用只读音频，不截图也不录屏。首次启动会自己弹授权框。</p>
+        <b>允许「屏幕与系统音频录制」</b>
+        <p>macOS 把「听电脑正在放的声音」放在这一项权限底下，没有单独的选项可以给。它只拿声音，不截图、不录画面。</p>
       </li>
       <li>
         <b>点「立即重启应用」</b>
-        <p>macOS 在进程启动时缓存权限判定结果，刚授权的进程读到的还是旧值。引导页上有重启按钮。</p>
+        <p>刚给的权限要重开一次才生效。引导页上有这个按钮，点一下就行。</p>
       </li>
       <li>
         <b>完成</b>
@@ -308,11 +301,11 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
     <h2>已知限制</h2>
     <p class="sub">这些是现在就知道的，写在这里省得你踩。</p>
     <ul class="limits">
-      <li><b>只支持 macOS 26 及以上。</b>用的是 macOS 26 才有的本机识别和翻译 API，更低版本装不上。</li>
-      <li><b>延迟约 1.5 秒。</b>其中约 1 秒是识别模型的解码窗口，软件改不了。</li>
-      <li><b>只采集系统播放的声音，不采麦克风。</b>也就是说它听得到面试官，听不到你自己。这是刻意的。</li>
-      <li><b>没有苹果开发者证书。</b>每次更新都要重新授权一次屏幕录制，因为 macOS 按代码签名哈希记授权。</li>
-      <li><b>实测只验证过英语 → 中文。</b>其它语言对框架上支持，但没测过。</li>
+      <li><b>只能装在 macOS 26 及以上。</b>它靠的是 macOS 26 才有的本机听写和翻译能力，旧系统装不上。</li>
+      <li><b>慢约 1.5 秒。</b>这是苹果听写能力的速度上限，换电脑也不会更快。</li>
+      <li><b>只听电脑放出来的声音，不听麦克风。</b>也就是说它听得到面试官，听不到你自己。这是故意的。</li>
+      <li><b>每次更新完要重新授权一次。</b>因为没有苹果开发者证书，系统会把新版本当成另一个应用。</li>
+      <li><b>只认真测过英语 → 中文。</b>法语、德语、日语、西班牙语在设置里能选，但我没实测过效果。</li>
       <li><b>合规提示：</b>不同国家和地区对会议录音 / 转写的告知义务不同。本应用不录音、不保存音频，但文字转写是否需要告知对方，请你自行确认。</li>
     </ul>
   </div>
@@ -323,33 +316,38 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
     <h2>常见问题</h2>
 
     <details>
-      <summary>为什么要「屏幕录制」权限？会不会被截屏？</summary>
-      <p>macOS 把「采集系统正在播放的声音」归在「屏幕与系统音频录制」这一项权限下，没有单独的「系统音频」权限可申请。应用只取音频流，画面帧直接丢弃。</p>
+      <summary>为什么要「屏幕录制」权限？会不会偷看我的屏幕？</summary>
+      <p>macOS 把「听电脑正在放的声音」归在「屏幕与系统音频录制」这一项底下，没有单独的「系统声音」权限可以申请，所以只能要这一项。它只拿声音，画面直接扔掉，不截图也不录屏。</p>
     </details>
 
     <details>
       <summary>对方真的看不到吗？</summary>
-      <p>字幕窗设了 <code>sharingType = .none</code>，对所有录屏和屏幕共享 API 都不可见，包括你自己的采集。不过请先用会议软件的共享预览自测一次——有些软件直接抓屏幕原始画面，不遵守这个标记。</p>
+      <p>看不到。字幕窗被设成对所有录屏和屏幕共享都不可见，连你自己录屏都录不到它。不过第一次用之前，建议你先用会议软件的共享预览自己看一眼——少数软件直接抓屏幕原始画面，不守这个规矩。</p>
     </details>
 
     <details>
       <summary>它会把我的面试内容传到云端吗？</summary>
-      <p>不会。识别和翻译都用 macOS 自带的本机模型，应用的沙盒 entitlements 里<b>根本没有申请网络权限</b>——不是「我们承诺不联网」，是技术上发不出请求。</p>
+      <p>不会，而且不是「承诺不传」——它根本没有联网的能力，连不上任何服务器。你可以拔掉网线试试，功能完全不受影响。</p>
     </details>
 
     <details>
-      <summary>为什么译文是一整句出现，而原文是逐词出现的？</summary>
-      <p>刻意的。边说边翻的话，中文语序和英文不一样，译文会被反复重写，整行乱跳，比多等一秒难受得多。所以只有整句定稿后才翻译，译文一旦出现就不再改。</p>
+      <summary>为什么译文是一整句出现，原文却是一个词一个词出现的？</summary>
+      <p>故意这么做的。中文和英文语序不一样，边听边翻的话译文会被反复改写，整行字乱跳，比多等一秒难受得多。所以只有一句话说完了才翻，翻出来就不再改。</p>
     </details>
 
     <details>
       <summary>能帮我生成回答吗？</summary>
-      <p>不能，以后也不会做。产品边界是「只帮你听懂，不替你回答」。</p>
+      <p>不能，以后也不会做。它只帮你听懂，不替你回答。</p>
     </details>
 
     <details>
       <summary>会不会很耗电？</summary>
-      <p>识别和翻译都跑在 Apple 芯片的神经引擎上，比云端方案省电。但长会话的 CPU 占用还没有实测数据，别把它当已验证结论。</p>
+      <p>听写和翻译都跑在 Apple 芯片自己的加速单元上，比那些把声音传上云的方案省电。但我还没测过连续一小时的耗电和发热，这点先别当成已验证的结论。</p>
+    </details>
+
+    <details>
+      <summary>可以用在上课、看视频、听播客上吗？</summary>
+      <p>可以。它不认得「这是面试」，只要是你电脑里放出来的声音，它都能听。只是所有的设计取舍都是围绕面试做的：低调、不留痕、不抢焦点。</p>
     </details>
   </div>
 </section>
@@ -359,7 +357,6 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
     <p>免费 · MIT 开源 · v0.1.0 · 0.8 MB · 需要 macOS 26 及以上</p>
     <p>
       <a href="AwesomeRealtimeTranslator-0.1.0.zip">下载 macOS 版</a> ·
-      <a href="report.html">技术细节与实测数据</a> ·
       <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator">GitHub</a>
     </p>
   </div>
