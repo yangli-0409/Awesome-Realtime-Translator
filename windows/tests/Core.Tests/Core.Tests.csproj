@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    平台无关的测试工程：在 Windows、macOS、Linux 上都能跑。
+    这是整个 Windows 版唯一能在 Mac 开发机上真实执行的验证手段，
+    所以凡是能放进 Core 的逻辑都放了进去。
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>AwesomeRealtimeTranslator.Core.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Core/Core.csproj" />
+  </ItemGroup>
+
+</Project>

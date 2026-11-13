@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms><!-- 只为了 NotifyIcon（托盘图标），WPF 自己没有 -->
+    <RootNamespace>AwesomeRealtimeTranslator</RootNamespace>
+    <AssemblyName>AwesomeRealtimeTranslator</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- LibraryImport 源生成器产出的封送代码是 unsafe 的，必须打开 -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Resources/app.ico</ApplicationIcon>
+    <Version>0.1.0</Version>
+
+    <!-- 在非 Windows 机器上也能编译（本项目就是在 macOS 上开发的）。 -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!--
+      钉死 RID。这是个 Windows 应用，没有「跟随宿主平台」这回事；
+      不钉的话在 macOS 上跑 dotnet build 会去找 osx-arm64 的 WindowsDesktop
+      运行时包，然后 NETSDK1082 失败。钉上之后整个解决方案在 Mac 上也能一把构建。
+      要出 ARM 版 Windows 包就命令行传 -r win-arm64 覆盖。
+    -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <!-- 发布成单文件，和 macOS 版「拖进应用程序就能用」对齐 -->
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      UseWindowsForms 会把 System.Windows.Forms 和 System.Drawing 塞进全局 using，
+      于是 Application / Clipboard / Color 这些名字同时存在于 WPF 和 WinForms 两边，
+      满屏 CS0104。这里只为了托盘图标（NotifyIcon）才引 WinForms，
+      所以把这两个全局 using 摘掉，需要的地方用 Forms 别名或全名。
+    -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Whisper.net" Version="1.8.1" />
+    <PackageReference Include="Whisper.net.Runtime" Version="1.8.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Core/Core.csproj" />
+  </ItemGroup>
+
+</Project>

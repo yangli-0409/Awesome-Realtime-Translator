@@ -1,0 +1,7 @@
+bin/
+obj/
+publish/
+
+# 模型文件总共约 380MB，不进仓库。
+# 开发用 tools/fetch-models.sh 拉，发布时打进安装包。
+models/

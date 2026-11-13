@@ -1,0 +1,141 @@
+<Window x:Class="AwesomeRealtimeTranslator.Settings.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="面试字幕 · 设置"
+        Width="460" SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="#1B1F24"
+        Foreground="#E8EEF5">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E8EEF5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="Hint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#93A3B4" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,3,0,0" />
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#3DDC97" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,18,0,8" />
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="22,18,22,20">
+
+        <TextBlock Style="{StaticResource SectionTitle}" Text="显示" />
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="显示模式" />
+            <ComboBox Grid.Column="1" x:Name="DisplayModeBox" SelectionChanged="OnDisplayModeChanged" />
+        </Grid>
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="46" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="字号" />
+            <Slider Grid.Column="1" x:Name="FontSizeSlider"
+                    Minimum="11" Maximum="36" TickFrequency="1" IsSnapToTickEnabled="True"
+                    ValueChanged="OnFontSizeChanged" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" x:Name="FontSizeValue" HorizontalAlignment="Right" />
+        </Grid>
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="46" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="不透明度" />
+            <Slider Grid.Column="1" x:Name="OpacitySlider"
+                    Minimum="0.3" Maximum="1.0" TickFrequency="0.02" IsSnapToTickEnabled="True"
+                    ValueChanged="OnOpacityChanged" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" x:Name="OpacityValue" HorizontalAlignment="Right" />
+        </Grid>
+
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="46" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="显示行数" />
+            <Slider Grid.Column="1" x:Name="LinesSlider"
+                    Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"
+                    ValueChanged="OnLinesChanged" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" x:Name="LinesValue" HorizontalAlignment="Right" />
+        </Grid>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="46" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="原文显现节奏" />
+            <Slider Grid.Column="1" x:Name="PaceSlider"
+                    Minimum="0.3" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="True"
+                    ValueChanged="OnPaceChanged" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" x:Name="PaceValue" HorizontalAlignment="Right" />
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}" x:Name="PaceHint" />
+
+        <TextBlock Style="{StaticResource SectionTitle}" Text="行为" />
+
+        <CheckBox x:Name="ClickThroughBox" Foreground="#E8EEF5" Margin="0,0,0,2"
+                  Checked="OnClickThroughChanged" Unchecked="OnClickThroughChanged"
+                  Content="鼠标穿透字幕窗" />
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="开启后点击会落到后面的窗口上，字幕窗彻底不挡路。想拖动或改设置时先关掉。" />
+
+        <CheckBox x:Name="HideFromSharingBox" Foreground="#E8EEF5" Margin="0,12,0,2"
+                  Checked="OnHideFromSharingChanged" Unchecked="OnHideFromSharingChanged"
+                  Content="屏幕共享时隐藏字幕窗" />
+        <TextBlock Style="{StaticResource Hint}" x:Name="HideFromSharingHint"
+                   Text="字幕窗不会出现在任何录屏或共享画面里，你自己照常看得见。需要 Windows 10 2004 及以上。" />
+
+        <CheckBox x:Name="SaveTranscriptsBox" Foreground="#E8EEF5" Margin="0,12,0,2"
+                  Checked="OnSaveTranscriptsChanged" Unchecked="OnSaveTranscriptsChanged"
+                  Content="把每场记录保存到硬盘" />
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="默认关闭。面试记录含对方可识别信息，默认留痕对隐私不友好；需要复盘时再打开。" />
+
+        <TextBlock Style="{StaticResource SectionTitle}" Text="语言" />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="对方说的语言" />
+            <ComboBox Grid.Column="1" x:Name="SourceLanguageBox" SelectionChanged="OnSourceLanguageChanged" />
+        </Grid>
+        <TextBlock Style="{StaticResource Hint}"
+                   Text="改了语言要重新开始会话才生效。只实测过英语 → 中文。" />
+
+        <Border Margin="0,20,0,0" Padding="12,10" CornerRadius="8" Background="#12FFFFFF">
+            <StackPanel>
+                <TextBlock FontSize="11" Foreground="#93A3B4" TextWrapping="Wrap"
+                           Text="快捷键：Ctrl+Alt+T 开始/暂停，Ctrl+Alt+H 显示/隐藏字幕窗。" />
+                <TextBlock FontSize="11" Foreground="#93A3B4" TextWrapping="Wrap" Margin="0,6,0,0"
+                           x:Name="ModelPathText" />
+            </StackPanel>
+        </Border>
+
+        <Button Margin="0,16,0,0" Padding="16,6" HorizontalAlignment="Right"
+                Click="OnCloseClick" Content="关闭" />
+    </StackPanel>
+</Window>

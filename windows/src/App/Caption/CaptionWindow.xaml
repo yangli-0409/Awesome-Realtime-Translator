@@ -1,0 +1,185 @@
+<Window x:Class="AwesomeRealtimeTranslator.Caption.CaptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:AwesomeRealtimeTranslator.Caption"
+        Title="面试字幕"
+        Width="760" Height="200"
+        MinWidth="320" MinHeight="120"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        SizeToContent="Manual">
+
+    <Window.Resources>
+        <local:NullToVisibilityConverter x:Key="NullToVisibility" />
+        <local:BoolToRunningConverter x:Key="BoolToRunning" />
+        <local:BoolToBrushConverter x:Key="BoolToBrush" />
+
+        <!-- 头部那三个小按钮：无边框、只有悬停时有一点底色 -->
+        <Style x:Key="HeaderButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#B3FFFFFF" />
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="#2EFFFFFF" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="Root"
+            CornerRadius="12"
+            Background="#D1000000"
+            BorderBrush="#1FFFFFFF"
+            BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- 头部：状态 + 三个按钮。整条都可以拖动窗口。 -->
+            <Grid Grid.Row="0"
+                  x:Name="Header"
+                  Background="Transparent"
+                  MouseLeftButtonDown="OnHeaderDrag"
+                  Margin="12,6,8,6">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                             Fill="{Binding Store.IsRunning, Converter={StaticResource BoolToBrush}}" />
+                    <TextBlock Margin="8,0,0,0"
+                               FontSize="10"
+                               VerticalAlignment="Center"
+                               Foreground="#A6FFFFFF"
+                               Text="{Binding Store.IsRunning, Converter={StaticResource BoolToRunning}}" />
+                    <TextBlock x:Name="ClickThroughHint"
+                               Margin="10,0,0,0"
+                               FontSize="10"
+                               VerticalAlignment="Center"
+                               Foreground="#66FFFFFF"
+                               Visibility="Collapsed"
+                               Text="鼠标穿透" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center">
+                    <Button x:Name="ToggleButton"
+                            Style="{StaticResource HeaderButton}"
+                            Click="OnToggleClick"
+                            ToolTip="开始 / 暂停（Ctrl+Alt+T）"
+                            Content="▶" />
+                    <Button Style="{StaticResource HeaderButton}"
+                            Click="OnSettingsClick"
+                            ToolTip="设置"
+                            Content="⚙" />
+                    <!--
+                        退出按钮必须在这里，理由和 macOS 版一样：这是个不进任务栏、
+                        不抢焦点的窗口，Alt+F4 到不了它。没有这个按钮，用户只能去
+                        任务管理器结束进程。
+                    -->
+                    <Button Style="{StaticResource HeaderButton}"
+                            Click="OnQuitClick"
+                            ToolTip="退出面试字幕"
+                            Content="⏻" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="1" Height="1" Background="#1AFFFFFF" />
+
+            <!-- 字幕正文 -->
+            <ScrollViewer Grid.Row="2"
+                          x:Name="Scroller"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="14,10,14,10">
+                <StackPanel x:Name="Lines">
+                    <TextBlock x:Name="StatusText"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"
+                               Foreground="#E6E7B416"
+                               Visibility="{Binding Store.StatusMessage, Converter={StaticResource NullToVisibility}}"
+                               Text="{Binding Store.StatusMessage}" />
+
+                    <ItemsControl x:Name="LineList" ItemsSource="{Binding VisibleLines}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding Source}"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding DataContext.SourceVisibility,
+                                                   RelativeSource={RelativeSource AncestorType=Window}}"
+                                               FontSize="{Binding DataContext.Settings.FontSize,
+                                                   RelativeSource={RelativeSource AncestorType=Window}}"
+                                               Foreground="#B8FFFFFF" />
+                                    <!--
+                                        译文行始终占位。macOS 版踩过的坑：译文「到了才插入」
+                                        会让整块变高，上面的历史行一起往上顶一次，看起来就是
+                                        布局跳动。这里未完成时渲染一个同字号的省略号，
+                                        单行译文高度完全不变。
+                                    -->
+                                    <ContentControl Visibility="{Binding DataContext.TranslationVisibility,
+                                                        RelativeSource={RelativeSource AncestorType=Window}}">
+                                        <TextBlock TextWrapping="Wrap"
+                                                   Margin="0,3,0,0"
+                                                   FontWeight="Medium"
+                                                   FontSize="{Binding DataContext.TranslationFontSize,
+                                                       RelativeSource={RelativeSource AncestorType=Window}}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="{Binding Translation}" />
+                                                    <Setter Property="Foreground" Value="White" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTranslating}" Value="True">
+                                                            <Setter Property="Text" Value="…" />
+                                                            <Setter Property="Foreground" Value="#59FFFFFF" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding TranslationFailed}" Value="True">
+                                                            <Setter Property="Text" Value="（本句翻译失败）" />
+                                                            <Setter Property="Foreground" Value="#CCFF9F43" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </ContentControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- 未定稿的尾句，逐字显现 -->
+                    <local:StreamingTextBlock x:Name="Pending"
+                                              TextWrapping="Wrap"
+                                              Foreground="#8CFFFFFF"
+                                              FullText="{Binding Store.PendingSource}"
+                                              Pace="{Binding Settings.RevealPace}"
+                                              FontSize="{Binding Settings.FontSize}"
+                                              Visibility="{Binding SourceVisibility}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

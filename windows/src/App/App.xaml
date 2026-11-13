@@ -1,0 +1,17 @@
+<Application x:Class="AwesomeRealtimeTranslator.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnExplicitShutdown">
+    <!--
+        ShutdownMode=OnExplicitShutdown：关掉字幕窗不等于退出应用。
+        和 macOS 版 LSUIElement 的语义一致——这是个常驻后台的工具，
+        只有用户点「退出」才真的结束。
+    -->
+    <Application.Resources>
+        <Style TargetType="ToolTip">
+            <Setter Property="Background" Value="#262C33" />
+            <Setter Property="Foreground" Value="#E8EEF5" />
+            <Setter Property="BorderBrush" Value="#3A434D" />
+        </Style>
+    </Application.Resources>
+</Application>

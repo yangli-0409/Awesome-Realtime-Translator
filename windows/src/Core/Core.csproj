@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    刻意是平台无关的 net10.0，不是 net10.0-windows。
+
+    所有难的逻辑（断句、显现节奏、翻译队列、导出）都放在这里，于是它们的单元测试
+    可以在任何机器上跑——包括开发这个 Windows 版所用的 Mac。平台相关的东西
+    （WASAPI、Whisper、Win32 窗口标志）全部留在 App 工程里，用接口隔开。
+
+    这与 macOS 版的分层是同一套：协议在中间，实现在边缘。
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>AwesomeRealtimeTranslator.Core</RootNamespace>
+    <AssemblyName>AwesomeRealtimeTranslator.Core</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 让测试工程能测 internal 的纯函数（CollapseCjkSpaces 这类） -->
+    <InternalsVisibleTo Include="Core.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      ONNX Runtime 本身是跨平台的（win / osx / linux 原生库都在这个包里），
+      所以翻译层放在 Core 而不是 App：它根本不是 Windows 特有的东西，
+      放这儿才能在开发机上跑真实的翻译测试。
+    -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.20.1" />
+  </ItemGroup>
+
+</Project>
