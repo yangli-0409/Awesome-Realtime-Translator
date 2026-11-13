@@ -1,9 +1,10 @@
 # Awesome-Realtime-Translator
 
-面试实时字幕（macOS）。听懂英文面试官。
+面试实时字幕。听懂英文面试官。
 
 **[下载与官网](https://yangli-0409.github.io/Awesome-Realtime-Translator/)** ·
-[English README](README.md) · [工程笔记](docs/ENGINEERING.zh-CN.md)
+[English README](README.md) · [工程笔记](docs/ENGINEERING.zh-CN.md) ·
+[Windows 版](windows/README.md)
 
 它听你电脑正在放出来的声音，在屏幕顶部的悬浮窗里显示原文字幕和中文翻译。
 全程在你自己这台机器上完成，不加入会议，对方看不到任何东西。
@@ -130,6 +131,26 @@ Sources/AwesomeRealtimeTranslator/
 4. 插拔耳机 / 切换输出设备后的自动恢复。
 5. 中文作为**源语言**时的识别效果。
 6. 全局快捷键在没有输入监控权限时还能不能用。
+
+## Windows 版
+
+已经写完，功能和 macOS 版对齐，代码在 [`windows/`](windows/README.md)。
+
+**但还没有人在 Windows 上真正跑过它。** 这个移植是在一台 Mac 上完成的：
+代码能编译成真正的 Windows 可执行文件（x64 和 arm64 都验证过），83 个单测全过，
+翻译也在开发机上用真实模型实测过。缺的是最关键的两件事——
+能不能抓到系统声音、字幕窗是不是真的从屏幕共享里消失。
+这两条需要一台 Windows 机器，所以暂时只开源码，不放下载。
+
+| | macOS | Windows |
+|---|---|---|
+| 系统音频 | ScreenCaptureKit | WASAPI loopback |
+| 需要权限 | 屏幕与系统音频录制 | **不需要** |
+| 语音识别 | 系统 SpeechAnalyzer | 自带 whisper.cpp |
+| 翻译 | 系统 Translation 框架 | 自带 OPUS-MT ONNX |
+| 安装包 | 0.8 MB | 约 540 MB |
+
+体积差在于 Windows 没有系统级的识别和翻译，模型得自己带。
 
 ## 范围
 
