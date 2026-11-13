@@ -185,7 +185,7 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
     <div class="cta">
       <a class="btn" href="AwesomeRealtimeTranslator-0.1.0.zip">下载 macOS 版</a>
-      <a class="btn ghost" href="#windows">Windows 版 <span class="tagline">待实测</span></a>
+      <a class="btn ghost" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.1.0-windows-beta">下载 Windows 版 <span class="tagline">Beta</span></a>
     </div>
     <p class="meta">
       v0.1.0 · 2026-11-10 · <b>需要 macOS 26 及以上</b> · Apple 芯片 / Intel 通用 · 0.8 MB
@@ -328,24 +328,30 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
 <section>
   <div class="wrap">
-    <h2 id="windows">Windows 版</h2>
-    <p class="sub">已经写完，功能和 Mac 版一样。但<b>还没有人在 Windows 上真正跑过它</b>，所以现在只开源码，不放下载。</p>
+    <h2 id="windows">Windows 版 <span class="tagline">Beta</span></h2>
+    <p class="sub">功能和 Mac 版一样。但<b>这个版本从来没有在 Windows 上运行过</b>——它是在一台 Mac 上写完的，所以标 Beta。</p>
 
     <ul class="limits">
-      <li><b>做完了什么。</b>听系统声音、边听边出字、整句翻译、字幕窗对屏幕共享隐藏、
+      <li><b>有的功能。</b>听系统声音、边听边出字、整句翻译、字幕窗对屏幕共享隐藏、
         不抢焦点、鼠标穿透、托盘、全局快捷键、设置、复制导出——Mac 版有的都有。</li>
-      <li><b>为什么还不放下载。</b>它是在一台 Mac 上写完的。代码能编译成真正的 Windows 程序，
-        断句和翻译也都在开发机上实测过，但「能不能抓到系统声音」和「字幕窗是不是真的
-        从屏幕共享里消失」这两件最关键的事，必须在 Windows 上跑一次才算数。
-        在那之前放下载按钮不负责任。</li>
-      <li><b>它会比 Mac 版大很多。</b>约 540 MB，因为 Windows 没有系统自带的语音识别和翻译，
+      <li><b>为什么叫 Beta。</b>代码能编译成真正的 Windows 程序，83 个单元测试全过，
+        翻译也用真实模型实测过。但「能不能抓到系统声音」和「字幕窗是不是真的从屏幕
+        共享里消失」这两件事，必须在 Windows 上跑一次才算数，而我没有 Windows 机器。</li>
+      <li><b>所以共享屏幕前请自己确认一次。</b>用会议软件的共享预览看一眼字幕窗在不在。
+        「以为对方看不到、其实看得到」是这个产品最严重的失败模式，这一步别省。</li>
+      <li><b>比 Mac 版大很多。</b>389 MB，因为 Windows 没有系统自带的语音识别和翻译，
         模型得自己带。Mac 版 0.8 MB 是因为这两样 macOS 都有。</li>
       <li><b>有一个地方反而更好。</b>Windows 版<b>不需要任何系统权限</b>，
         双击就能用，也没有 Mac 那个「每次更新都要重新授权」的麻烦。</li>
-      <li><b>想现在就试。</b>装 .NET 10 SDK，然后在仓库的 <code>windows/</code> 目录里跑
-        <code>tools/fetch-models.ps1</code> 和 <code>tools/package.ps1</code>。
-        跑通了欢迎来开 issue 告诉我结果——那正是现在最缺的一步。</li>
     </ul>
+
+    <div class="cta" style="justify-content:flex-start;margin:28px 0 0">
+      <a class="btn" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.1.0-windows-beta">下载 Windows 版 Beta</a>
+    </div>
+    <p class="meta" style="margin-top:12px">
+      389 MB · 需要 Windows 10 2004 及以上 · 跑通了或者踩坑了，欢迎来
+      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/issues">开 issue</a> 告诉我
+    </p>
   </div>
 </section>
 
@@ -407,7 +413,7 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
 <footer>
   <div class="wrap">
-    <p>免费 · MIT 开源 · v0.1.0 · 0.8 MB · 需要 macOS 26 及以上 · <a href="#windows">Windows 版待实测</a></p>
+    <p>免费 · MIT 开源 · v0.1.0 · 0.8 MB · 需要 macOS 26 及以上 · <a href="#windows">Windows 版 Beta</a></p>
     <p>
       <a href="AwesomeRealtimeTranslator-0.1.0.zip">下载 macOS 版</a> ·
       <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator">GitHub</a>
