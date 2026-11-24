@@ -203,12 +203,12 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
     </p>
 
     <div class="cta">
-      <a class="btn" href="AwesomeRealtimeTranslator-0.2.1.zip">下载 macOS 版 0.2.1</a>
-      <a class="btn ghost" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.2.0-windows-beta">下载 Windows 版 0.2.0 <span class="tagline">Beta</span></a>
+      <a class="btn" href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a>
+      <a class="btn ghost" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 <span class="tagline">Beta</span></a>
     </div>
     <p class="meta">
-      macOS <b>v0.2.1</b> · 2026-11-24 · 需要 macOS 26 及以上 · Apple 芯片 / Intel 通用 · 0.9 MB<br>
-      Windows <b>v0.2.0 Beta</b> · 2026-11-24 · 需要 Windows 10 2004 及以上 · 64 位 · 389 MB
+      macOS <b>v0.3.0</b> · 2026-11-24 · 需要 macOS 26 及以上 · Apple 芯片 / Intel 通用 · 0.9 MB<br>
+      Windows <b>v0.3.0 Beta</b> · 2026-11-24 · 需要 Windows 10 2004 及以上 · 64 位 · 389 MB
     </p>
   </div>
 </header>
@@ -251,7 +251,8 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
       <div class="card">
         <span class="pill">实时</span>
         <h3>边听边出字</h3>
-        <p>原文一个词一个词往前推，整句说完才给译文。译文一旦出现就不再改写，不会在你眼前反复跳。</p>
+        <p>原文一个词一个词往前推，整句说完才给译文。译文一旦出现就不再改写，不会在你眼前反复跳。
+          Windows 版 0.3.0 起译文也是逐字流出来的，不再整句一次性砸出来。</p>
       </div>
       <div class="card">
         <span class="pill">本机</span>
@@ -348,7 +349,7 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
 <section>
   <div class="wrap">
-    <h2 id="windows">Windows 版 0.2.0 <span class="tagline">Beta</span></h2>
+    <h2 id="windows">Windows 版 0.3.0 <span class="tagline">Beta</span></h2>
     <p class="sub">功能和 Mac 版一样。0.2.0 起，「字幕窗不出现在屏幕共享里」这条有自动化测试在真 Windows 上盯着了。仍然标 Beta，理由见下。</p>
 
     <ul class="limits">
@@ -356,6 +357,11 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
         不抢焦点、鼠标穿透、托盘、全局快捷键、设置、复制导出——Mac 版有的都有。</li>
       <li><b>已经跑通的。</b>有用户在真 Windows 上用起来了：抓得到系统声音，
         出得了字幕和译文。这是原先最大的两个未知项之一，现在过了。</li>
+      <li><b>0.3.0 修的：对方一直讲的时候，译文会停住不动。</b>同一位用户录了屏发回来，
+        实测译文能连续八秒一个字不动，英文在屏幕上堆到三行，然后两三句一起蹦出来。
+        原因是旧版只在对方停顿或窗口攒满 18 秒时才肯定稿一句，而真实会议里
+        对方根本不停。现在改成看到句号就定稿，而且<b>译文是逐字流出来的</b>，
+        不再整句一次性砸出来。顺带修掉了句子被切在半截上导致的烂译文。</li>
       <li><b>隐藏这件事现在有机器守着了。</b>每次改代码，都会在一台真 Windows 上
         把字幕窗显示出来、<b>真的截一次屏</b>，确认它不在截图里；同时跑一组对照——
         先不隐藏截一次，必须找得到，找不到就说明那台机器截不到图、本次不作数。
@@ -375,10 +381,10 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
     </ul>
 
     <div class="cta" style="justify-content:flex-start;margin:28px 0 0">
-      <a class="btn" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.2.0-windows-beta">下载 Windows 版 0.2.0 Beta</a>
+      <a class="btn" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 Beta</a>
     </div>
     <p class="meta" style="margin-top:12px">
-      v0.2.0 Beta · 2026-11-24 · 389 MB · 需要 Windows 10 2004 及以上 · 跑通了或者踩坑了，欢迎来
+      v0.3.0 Beta · 2026-11-24 · 389 MB · 需要 Windows 10 2004 及以上 · 跑通了或者踩坑了，欢迎来
       <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/issues">开 issue</a> 告诉我
     </p>
   </div>
@@ -442,10 +448,10 @@ footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;b
 
 <footer>
   <div class="wrap">
-    <p>免费 · MIT 开源 · macOS v0.2.1 · <a href="#windows">Windows v0.2.0 Beta</a></p>
+    <p>免费 · MIT 开源 · macOS v0.3.0 · <a href="#windows">Windows v0.3.0 Beta</a></p>
     <p>
-      <a href="AwesomeRealtimeTranslator-0.2.1.zip">下载 macOS 版 0.2.1</a> ·
-      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.2.0-windows-beta">下载 Windows 版 0.2.0</a> ·
+      <a href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a> ·
+      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0</a> ·
       <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator">GitHub</a>
     </p>
   </div>

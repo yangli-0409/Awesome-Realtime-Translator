@@ -94,9 +94,19 @@ final class AppCoordinator {
         store.isRunning = false
         store.statusMessage = nil // 清掉启动时的「点 ▶ 开始听」提示
         var config = Segmenter.Configuration()
-        // 0.45s：面试里句子之间的停顿通常在 0.3~0.6s，0.7s 偏保守，译文出得太晚。
-        // 再往下调（<0.35s）会把一句话从中间切断，翻译质量明显下降。
-        config.silenceFlushInterval = 0.45
+        // 1.4s。这里有一条隐式耦合，0.3.0 之前搞反了：
+        //
+        // `SpeechAnalyzer` 是**批量**吐结果的，实测每 ~950ms 一批（见 StreamingText）。
+        // 而 Segmenter 的静音判定看的是「距离上一个事件多久」，所以阈值一旦小于
+        // 批次间隔，它测的就不是对方停顿，而是识别器的出结果节奏——每两批之间
+        // 都会触发一次定稿，把句子切在随机位置上，翻译拿到残片只能给出烂译文。
+        //
+        // 原来这里是 0.45，注释写着「0.7 偏保守，译文出得太晚」。那个判断本身没错，
+        // 错在没看见它已经掉到批次间隔以下了。Windows 版同样的毛病，由真实用户的
+        // 录屏抓出来（windows/README.md 里「连续说话时译文停摆」那一节）。
+        //
+        // 见 SegmenterTests.testResultBatchCadenceDoesNotChopMidClause。
+        config.silenceFlushInterval = 1.4
         segmenter = Segmenter(configuration: config)
         panel.show()
 

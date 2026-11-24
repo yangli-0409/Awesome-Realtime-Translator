@@ -246,4 +246,64 @@ final class SegmenterTests: XCTestCase {
         _ = s.ingest(.volatile("and ho"), at: 0.8)
         XCTAssertEqual(s.pendingText, "What was the root cause and")
     }
+
+    // MARK: - 静音阈值和出结果节奏之间的耦合
+
+    /// `SpeechAnalyzer` 开了 `.fastResults` 之后仍然是**批量**吐结果：实测每 ~950ms
+    /// 吐一批，批内十几条结果的时间戳在同一毫秒（依据见 `StreamingText` 的注释）。
+    ///
+    /// `Segmenter` 的静音判定看的是「距离上一个事件多久」，所以
+    /// `silenceFlushInterval` 必须**大于批次间隔**，否则它测的根本不是对方停顿，
+    /// 而是识别器的出结果节奏——每两批之间都会触发一次定稿，把句子切在随机位置。
+    ///
+    /// Windows 版踩的就是这个（那边批次间隔 700ms、阈值 0.45），
+    /// 用户录像里那句切在 `and I` 上的残片就是它干的。Mac 这边阈值同样是 0.45，
+    /// 而批次间隔还更长（950ms），所以只会更容易触发。
+    private static let resultBatchInterval: TimeInterval = 0.95
+    private static let productionSilenceFlush: TimeInterval = 1.4
+
+    func testSilenceThresholdMustExceedResultBatchInterval() {
+        XCTAssertGreaterThan(
+            Self.productionSilenceFlush,
+            Self.resultBatchInterval,
+            "静音阈值必须大于识别器的出结果间隔，否则测的是解码节奏不是对方停顿"
+        )
+    }
+
+    func testResultBatchCadenceDoesNotChopMidClause() {
+        var s = makeSegmenter(silence: Self.productionSilenceFlush)
+
+        // 上一批定稿留下没有句末标点的半句
+        _ = s.ingest(.finalized("So I didn't go into this too much last time and I"), at: 0.0)
+        XCTAssertEqual(s.pendingText, "So I didn't go into this too much last time and I")
+
+        // 对方还在说：每 ~950ms 来一批，ticker 每 100ms 查一次
+        var t: TimeInterval = 0
+        for _ in 0..<8 {
+            t += Self.resultBatchInterval
+            _ = s.ingest(.volatile("can share this information"), at: t)
+
+            var u = t + 0.1
+            while u < t + Self.resultBatchInterval {
+                XCTAssertTrue(s.tick(at: u).isEmpty, "批次之间不该定稿，t=\(u)")
+                u += 0.1
+            }
+        }
+    }
+
+    func testTooShortAnIntervalChopsMidClause() {
+        // 0.2.1 之前的实际行为，钉在这里当反例。
+        var s = makeSegmenter(silence: 0.45)
+        _ = s.ingest(.finalized("So I didn't go into this too much last time and I"), at: 0.0)
+        let chopped = s.tick(at: 0.5)
+        XCTAssertEqual(chopped.map(\.text), ["So I didn't go into this too much last time and I"])
+    }
+
+    func testRealSilenceStillFlushes() {
+        // 改大阈值之后静音定稿必须仍然有效，否则对方说完最后半句就永远不出译文。
+        var s = makeSegmenter(silence: Self.productionSilenceFlush)
+        _ = s.ingest(.finalized("Can you walk me through it"), at: 0.0)
+        XCTAssertTrue(s.tick(at: 1.0).isEmpty, "1.0s 还没到阈值")
+        XCTAssertEqual(s.tick(at: 1.5).map(\.text), ["Can you walk me through it"])
+    }
 }

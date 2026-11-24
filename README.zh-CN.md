@@ -50,7 +50,7 @@
 
 需要 **macOS 26 及以上**。通用二进制（Apple 芯片 / Intel），0.8 MB。
 
-1. [下载](https://yangli-0409.github.io/Awesome-Realtime-Translator/AwesomeRealtimeTranslator-0.2.1.zip)、
+1. [下载](https://yangli-0409.github.io/Awesome-Realtime-Translator/AwesomeRealtimeTranslator-0.3.0.zip)、
    解压，拖进「应用程序」。
 2. **第一次打开用右键。** 系统会说「无法验证开发者」，因为这个版本背后没有苹果开发者证书。
    右键点它 → 选「打开」→ 再确认一次。只需要做一次。
@@ -119,7 +119,10 @@ Sources/AwesomeRealtimeTranslator/
 **已验证**
 
 - Swift 6 完全并发检查下零错误编译。
-- 断句的 27 个单元测试全过，含一段端到端事件脚本。其中 3 个 bug 是测试逮出来的。
+- 断句的 31 个单元测试全过，含一段端到端事件脚本。其中 3 个 bug 是测试逮出来的。
+  0.3.0 加的 4 条钉住一条隐式耦合：静音定稿的阈值必须大于识别器批量吐结果的间隔
+  （实测 ~950ms）。之前是 0.45，等于每两批之间都把句子切一刀——Windows 版
+  同样的毛病，由用户录屏抓出来的。
 - Release 配置打包成 `.app`，启动后进程存活、无崩溃报告。
 - 本机跑通整条管道：采集 → 识别 → 断句 → 翻译 → 字幕窗，反复运行日志无报错。
 
@@ -136,7 +139,7 @@ Sources/AwesomeRealtimeTranslator/
 
 已经写完，功能和 macOS 版对齐，代码在 [`windows/`](windows/README.md)。
 
-**[下载 Beta（389 MB）](https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.2.0-windows-beta)** · 需要 Windows 10 2004 及以上
+**[下载 Beta（389 MB）](https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta)** · 需要 Windows 10 2004 及以上
 
 解压后整个文件夹别拆开，模型和组件都得和主程序在一起。没有代码签名证书，
 Windows 会提示「未知发布者」，点「更多信息」→「仍要运行」。
@@ -156,6 +159,11 @@ Windows 会提示「未知发布者」，点「更多信息」→「仍要运行
 
 **2026-11-24：已经有用户在真 Windows 上跑起来了**——抓得到系统声音，出得了字幕
 和译文。原先最大的两个未知项都过了。
+
+同一位用户的录屏又揪出一件事：对方一直讲的时候，**译文会连续八秒一个字不动**，
+然后两三句一起蹦出来。旧版只在对方停顿或窗口攒满 18 秒时才定稿一句，而真实会议里
+对方根本不停。0.3.0 改成看到句号就定稿，译文也改成逐字流出，顺带修掉了句子被切在
+半截上导致的烂译文。细节见 [Windows 版的工程笔记](windows/README.md)。
 
 仍然标 Beta，但理由换了，而且小了一整个量级：CI 验的是 Windows 自带的截屏方式，
 而 **Zoom、Teams、飞书的桌面客户端抓画面的方式不止一种，还没有人在真的会议软件里

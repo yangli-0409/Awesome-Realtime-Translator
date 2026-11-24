@@ -58,7 +58,7 @@ is more responsive but visibly steppy, higher is smoother but lags further behin
 
 Needs **macOS 26 or newer**. Universal binary (Apple Silicon and Intel), 0.8 MB.
 
-1. [Download](https://yangli-0409.github.io/Awesome-Realtime-Translator/AwesomeRealtimeTranslator-0.2.1.zip),
+1. [Download](https://yangli-0409.github.io/Awesome-Realtime-Translator/AwesomeRealtimeTranslator-0.3.0.zip),
    unzip, drag into Applications.
 2. **Open it with right-click the first time.** macOS will say the developer cannot be verified,
    because there is no Apple developer certificate behind this build. Right-click the app →
@@ -138,8 +138,11 @@ An honest dividing line. Do not read the two lists as one.
 **Verified**
 
 - Compiles clean under Swift 6 strict concurrency.
-- All 27 sentence-splitting unit tests pass, including a full end-to-end event script. Three of
-  them caught real bugs.
+- All 31 sentence-splitting unit tests pass, including a full end-to-end event script. Three of
+  them caught real bugs. The four added in 0.3.0 pin down an implicit coupling: the
+  silence-flush threshold has to exceed the interval at which the recognizer emits its batches
+  of results (~950ms measured). It used to be 0.45, which chopped a sentence between every pair
+  of batches — the same defect a user's screen recording caught on Windows.
 - Release build packaged as a `.app`: stays alive, no crash reports.
 - The whole pipeline on a real machine — capture, recognition, splitting, translation, caption
   panel — with no errors in the logs across repeated runs.
@@ -159,7 +162,7 @@ An honest dividing line. Do not read the two lists as one.
 Written and feature-matched to the macOS version; the code lives in
 [`windows/`](windows/README.md).
 
-**[Download the beta (389 MB)](https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.2.0-windows-beta)** · needs Windows 10 2004 or newer
+**[Download the beta (389 MB)](https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta)** · needs Windows 10 2004 or newer
 
 Keep the extracted folder intact — the models and native components have to sit next to the
 executable. There is no code-signing certificate, so Windows will warn about an unknown
@@ -182,6 +185,13 @@ Before 0.2.0 nobody and nothing had ever verified this.
 
 **2026-11-24: a user has now run it on real Windows** — system audio capture works, captions
 and translations come through. Both of the two biggest unknowns have now passed.
+
+A screen recording from the same user then surfaced another one: while the other person keeps
+talking, **the translation froze for eight seconds at a time** and then three sentences landed
+at once. The old build only finalized a sentence on a pause or once the window hit 18 seconds,
+and in a real meeting nobody pauses. 0.3.0 finalizes on sentence-ending punctuation instead,
+streams the translation out token by token, and fixes the garbled output that came from
+sentences being cut mid-clause. Details in the [Windows engineering notes](windows/README.md).
 
 It is still labelled beta, but for a smaller reason: CI verifies the capture path Windows
 itself provides, and **nobody has tested it inside an actual meeting client** — Zoom, Teams
