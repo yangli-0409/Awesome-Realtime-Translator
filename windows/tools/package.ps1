@@ -63,7 +63,7 @@ else {
 
 Write-Host "`n[3/3] 写说明并压缩 …" -ForegroundColor Cyan
 @"
-面试字幕 $version （Windows）
+字幕宝 $version （Windows）
 
 怎么用
   1. 先把整个文件夹解压出来，放到一个固定位置

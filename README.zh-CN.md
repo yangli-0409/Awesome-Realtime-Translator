@@ -1,6 +1,6 @@
 # Awesome-Realtime-Translator
 
-面试实时字幕。听懂英文面试官。
+**字幕宝**：面试实时字幕。听懂英文面试官。
 
 **[下载与官网](https://yangli-0409.github.io/Awesome-Realtime-Translator/)** ·
 [English README](README.md) · [工程笔记](docs/ENGINEERING.zh-CN.md) ·

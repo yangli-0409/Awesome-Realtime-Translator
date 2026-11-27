@@ -1,7 +1,7 @@
 <Window x:Class="AwesomeRealtimeTranslator.Settings.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="面试字幕 · 设置"
+        Title="字幕宝 · 设置"
         Width="460" SizeToContent="Height"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"

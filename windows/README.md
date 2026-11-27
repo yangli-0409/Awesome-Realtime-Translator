@@ -1,4 +1,4 @@
-# 面试字幕 · Windows 版
+# 字幕宝 · Windows 版
 
 [![Windows](https://github.com/yangli-0409/Awesome-Realtime-Translator/actions/workflows/windows.yml/badge.svg)](https://github.com/yangli-0409/Awesome-Realtime-Translator/actions/workflows/windows.yml)
 

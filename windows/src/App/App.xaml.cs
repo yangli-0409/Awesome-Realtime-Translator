@@ -68,7 +68,7 @@ public partial class App : System.Windows.Application
             MessageBox.Show(
                 $"出错了，但程序还在运行，字幕不受影响。\n\n{e.Exception.Message}\n\n" +
                 $"详细信息已写入日志：\n{Diagnostics.Log.FilePath}",
-                "面试字幕",
+                "字幕宝",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         };
@@ -116,7 +116,7 @@ public partial class App : System.Windows.Application
             Visible = true,
 
             // 带上版本号：悬停就能看到自己装的是哪一版，不用去翻日志。
-            Text = $"面试字幕 {AppVersion.Current}",
+            Text = $"字幕宝 {AppVersion.Current}",
             Icon = LoadTrayIcon(),
         };
 
@@ -253,7 +253,7 @@ public partial class App : System.Windows.Application
             MessageBox.Show(
                 $"设置窗打不开，但字幕不受影响。\n\n{ex.Message}\n\n" +
                 $"详细信息已写入日志：\n{Diagnostics.Log.FilePath}",
-                "面试字幕",
+                "字幕宝",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }

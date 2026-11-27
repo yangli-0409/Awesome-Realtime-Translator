@@ -96,7 +96,7 @@ struct CaptionView: View {
                     .foregroundStyle(.white.opacity(0.45))
             }
             .buttonStyle(.plain)
-            .help("退出面试字幕")
+            .help("退出字幕宝")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)

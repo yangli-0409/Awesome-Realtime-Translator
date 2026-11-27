@@ -1,6 +1,6 @@
 # Awesome-Realtime-Translator
 
-Real-time captions for English interviews, on your Mac.
+**字幕宝** (Zìmù Bǎo): real-time captions for English interviews, on your Mac.
 
 **[Download and website](https://yangli-0409.github.io/Awesome-Realtime-Translator/)** ·
 [中文 README](README.zh-CN.md) · [Engineering notes](docs/ENGINEERING.md) ·

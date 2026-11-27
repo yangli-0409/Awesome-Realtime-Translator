@@ -1,461 +1,482 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-density="b" data-view="mine">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>面试字幕 · 实时听懂英文面试官</title>
-<meta name="description" content="抓取电脑正在播放的声音，在悬浮窗里显示原文和中文翻译。全程本机处理，不联网，对方看不到。">
+<title>字幕宝 · 实时听懂英文面试官</title>
+<meta name="description" content="面试实时字幕。抓取电脑正在播放的声音，在悬浮窗里显示原文和中文翻译。共享屏幕时对方看不到字幕窗，全程本机处理，不联网。">
 <style>
 :root{
-  --bg:#0b0f14;
-  --surface:#131a22;
-  --surface-2:#1a232d;
-  --line:rgba(255,255,255,.09);
-  --text:#e8eef5;
-  --muted:#93a3b4;
-  --accent:#3ddc97;
-  --accent-dim:rgba(61,220,151,.14);
-  --radius:14px;
+  /* 字幕宝：直接、亲切的国民小工具。左对齐单栏；「字幕黄」只做底色（老电影字幕的黄），压在译文那一行和图标上；绿色只留在字幕窗这个真实界面里。字号 3 档，字重 2 档。 */
+  --paper:#f6f5ef;
+  --ink:#1b1a16;
+  --muted:#69675d;
+  --line:rgba(27,26,22,.11);
+  --accent:#ffd53d;
+  --desk:#e9e6da;
+  --panel:#f3f1e8;
+  --tile:#dad6c8;
+  --mac:#e9dfbc;
+  --win:#d3dfe2;
+  --f:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+  --display:clamp(28px,4.4vw,50px);
+  --title:24px;
+  --body:16px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  color-scheme:light;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 var(--body)/1.75 var(--f);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px;transition:text-decoration-color .2s}
+a:hover{text-decoration-color:currentColor}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+h1,h2,h3,p,ol,ul,dl,dd{margin:0}
+h1{font-size:var(--display);font-weight:600;line-height:1.42;letter-spacing:-.02em}
+h1 mark{background:var(--accent);color:inherit;padding:.06em .3em;margin-left:-.3em;border-radius:.16em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.herorow{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px}
+.dl{display:grid;gap:14px}
+.after{margin-top:22px}
+h2{font-size:var(--title);font-weight:600;line-height:1.35;letter-spacing:-.005em;text-wrap:balance}
+h3{font-size:var(--body);font-weight:600}
+.muted{color:var(--muted)}
+.measure{max-width:38em}
 
-/* 右上角常驻的 GitHub 入口。固定定位，滚到任何一屏都在 */
-.gh{
-  /* top 要让开顶部那条自测页横幅（约 44px 高），否则会压住「打开自测页 →」 */
-  position:fixed;top:58px;right:20px;z-index:10;
-  width:38px;height:38px;border-radius:50%;
-  display:grid;place-items:center;
-  color:rgba(255,255,255,.55);
-  background:rgba(10,14,19,.5);border:1px solid var(--line);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-}
-.gh:hover{color:#fff;border-color:rgba(255,255,255,.28)}
+/* 自测页提醒：原页面刻意放在最上面，保留位置 */
+.check{display:block;background:var(--ink);color:var(--paper);text-decoration:none;padding:10px 0}
+.check .wrap{display:flex;gap:6px 18px;flex-wrap:wrap;justify-content:space-between}
+.check span:last-child{white-space:nowrap}
+.check:hover span:last-child{text-decoration:underline;text-underline-offset:4px}
 
-/* 顶部那条自测页入口。放在最上面是故意的：
-   「以为对方看不到、其实看得到」是这个产品最严重的失败模式，
-   这条提醒的价值高于任何一句卖点。 */
-.topbar{
-  display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;
-  padding:11px 24px;text-align:center;
-  background:var(--accent-dim);border-bottom:1px solid rgba(61,220,151,.22);
-  color:var(--text);font-size:14.5px;
-}
-.topbar:hover{text-decoration:none;background:rgba(61,220,151,.2)}
-.topbar-go{color:var(--accent);font-weight:600;white-space:nowrap}
-@media (max-width:560px){ .topbar{font-size:13.5px;padding:10px 20px} }
-.gh svg{width:19px;height:19px;display:block}
+.top{display:flex;align-items:center;justify-content:space-between;padding:26px 0 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;text-decoration:none}
+.brand svg{width:36px;height:36px;display:block}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 5.2s infinite;transition:transform .3s var(--ease)}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+[data-view="theirs"] .eye{animation:none;transform:scaleY(.1)}
+.tagline{font-weight:400;color:var(--muted);margin-left:4px}
 
 /* hero */
-.hero{
-  position:relative;overflow:hidden;text-align:center;
-  padding:96px 0 72px;
-  background:radial-gradient(1200px 500px at 50% -10%,#2b3a4a 0%,#141c25 45%,var(--bg) 100%);
-  border-bottom:1px solid var(--line);
-}
-.hero .icon{width:112px;height:112px;margin:0 auto 28px;display:block;
-  filter:drop-shadow(0 18px 40px rgba(0,0,0,.55))}
-h1{margin:0 0 14px;font-size:46px;line-height:1.2;letter-spacing:-.5px}
-.lede{margin:0 auto;max-width:620px;font-size:19px;color:var(--muted)}
-.lede b{color:var(--text);font-weight:600}
-.cta{margin:36px 0 14px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn{
-  display:inline-block;padding:13px 26px;border-radius:11px;font-size:16px;font-weight:600;
-  background:var(--accent);color:#06281b;border:1px solid transparent;
-}
-.btn:hover{text-decoration:none;filter:brightness(1.07)}
-.btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}
-.meta{font-size:13.5px;color:var(--muted)}
-.tagline{
-  font-size:10.5px;font-weight:700;letter-spacing:.3px;
-  padding:2px 6px;border-radius:5px;margin-left:6px;
-  background:rgba(255,200,80,.16);color:#f0c15c;vertical-align:1px;
-}
-.meta code{background:var(--surface-2);padding:2px 6px;border-radius:5px;font-size:12.5px}
+.hero{padding:clamp(36px,6vw,76px) 0 clamp(20px,3vw,28px);display:grid;gap:20px}
+.cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
+.btn{display:inline-block;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600;padding:13px 24px;border-radius:10px;transition:transform .25s var(--ease),background .2s}
+.btn:hover{background:#000;transform:translateY(-1px)}
+/* 两个平台同权重：明度相同、色相不同的两块浅色 */
+.btn.mac{background:var(--mac);color:var(--ink)}
+.btn.win{background:var(--win);color:var(--ink)}
+.btn.mac:hover{background:#e0d4ab}
+.btn.win:hover{background:#c7d4d7}
+.btn:active{transform:translateY(0) scale(.985)}
 
-/* sections */
-section{padding:72px 0}
-section+section{border-top:1px solid var(--line)}
-h2{margin:0 0 10px;font-size:28px;letter-spacing:-.3px}
-.sub{margin:0 0 34px;color:var(--muted)}
-h3{margin:0 0 8px;font-size:17px}
+/* 演示舞台 */
+.seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;background:var(--desk);border-radius:10px;padding:3px}
+.seg button{position:relative;z-index:1;font:inherit;color:var(--muted);background:none;border:0;padding:7px 18px;border-radius:8px;cursor:pointer;transition:color .25s;white-space:nowrap}
+.seg button[aria-pressed="true"]{color:var(--ink)}
+.seg i{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--paper);border-radius:8px;transition:transform .45s var(--ease)}
+[data-view="theirs"] .seg i{transform:translateX(100%)}
 
-/* 对比 */
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.pane{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
-.pane>.tag{font-size:12.5px;color:var(--muted);margin-bottom:12px;display:block}
-.screen{background:#0a0e13;border:1px solid var(--line);border-radius:10px;padding:14px;min-height:188px;position:relative}
-.face{display:flex;gap:9px;align-items:center;margin-bottom:10px}
-.dot{width:30px;height:30px;border-radius:50%;background:#33434f}
-.who{font-size:12.5px;color:var(--muted)}
-.wave{height:7px;border-radius:4px;background:#243039;margin:7px 0}
-.wave.s{width:62%}
-.wave.m{width:84%}
+.stage{position:relative;background:var(--desk);border-radius:18px;padding:clamp(12px,2.2vw,22px);display:grid;gap:clamp(12px,2vw,20px);justify-items:center;overflow:hidden}
+.capslot{position:relative;width:min(780px,100%)}
+.ghost{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);opacity:0;transition:opacity .35s}
 .cap{
-  position:absolute;left:12px;right:12px;bottom:12px;
-  background:rgba(0,0,0,.82);border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+  --fs:clamp(12.5px,1.55vw,15px);
+  position:relative;background:rgba(0,0,0,.86);color:#fff;border-radius:12px;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 22px 48px -18px rgba(0,0,0,.45);
+  font-size:var(--fs);line-height:1.45;
+  transition:opacity .45s var(--ease),transform .45s var(--ease),filter .45s var(--ease);
 }
-.cap .src{font-size:12.5px;color:rgba(255,255,255,.62);margin-bottom:3px}
-.cap .dst{font-size:13.5px;color:#fff;font-weight:600}
-.pane.hidden-note{border-style:dashed}
-.none{
-  display:flex;align-items:center;justify-content:center;height:100%;
-  color:var(--muted);font-size:13px;
-}
+[data-view="theirs"] .cap{opacity:0;transform:translateY(-8px) scale(.985);filter:blur(8px)}
+[data-view="theirs"] .ghost{opacity:1;transition-delay:.2s}
+.caphead{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:.72em;color:rgba(255,255,255,.65);box-shadow:0 1px 0 rgba(255,255,255,.08)}
+.caphead .dot{width:7px;height:7px;border-radius:50%;background:#34c759}
+.caphead .sp{flex:1}
+.caphead svg{width:11px;height:11px;fill:rgba(255,255,255,.45);display:block}
+.caphead svg.on{fill:rgba(255,255,255,.7)}
+.pin{display:flex;gap:8px;padding:7px 14px;background:rgba(52,199,89,.1);box-shadow:0 1px 0 rgba(255,255,255,.08)}
+.pin svg{flex:none;width:1em;height:1em;margin-top:.2em;fill:rgba(52,199,89,.75)}
+.pin .s{color:rgba(255,255,255,.6);font-size:.9em}
+.pin .t{color:rgba(255,255,255,.95);font-weight:600}
+.pin .t.wait{color:rgba(255,255,255,.35)}
+.capbody{height:7.6em;padding:10px 14px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;overflow:hidden}
+.ln,.pend{flex:none}
+.ln .s{color:rgba(255,255,255,.72)}
+.ln .t{color:#fff;font-size:1.07em}
+.ln .t.wait{color:rgba(255,255,255,.35)}
+.pend{color:rgba(255,255,255,.55);min-height:1.45em}
+.pend:empty{display:none}
 
-/* 特性 */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-.card p{margin:0;color:var(--muted);font-size:14.5px}
-.pill{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;
-  background:var(--accent-dim);color:var(--accent);margin-bottom:12px}
+.meet{width:min(780px,100%);background:var(--panel);border-radius:12px;padding:clamp(10px,1.6vw,16px);display:grid;gap:12px}
+.tiles{display:grid;grid-template-columns:3fr 1fr;gap:12px}
+.tile{position:relative;background:var(--tile);border-radius:8px;aspect-ratio:16/7;overflow:hidden;display:grid;place-items:end center}
+.tile.me{aspect-ratio:auto}
+.tile svg{width:30%;display:block;fill:var(--panel)}
+.tile.me svg{width:70%}
+.who{position:absolute;left:10px;bottom:8px;display:flex;align-items:center;gap:8px;color:var(--ink);font-size:13px;line-height:1}
+.lv{display:flex;align-items:center;gap:2px;height:12px}
+.lv b{width:2px;height:3px;border-radius:1px;background:var(--ink);transition:height .2s}
+.speaking .lv b{animation:lv .7s ease-in-out infinite alternate}
+.speaking .lv b:nth-child(2){animation-delay:-.35s}
+.speaking .lv b:nth-child(3){animation-delay:-.15s}
+@keyframes lv{from{height:3px}to{height:12px}}
+.ctl{display:flex;justify-content:center;gap:10px}
+.ctl i{width:26px;height:26px;border-radius:50%;background:var(--tile)}
 
-/* 步骤 */
-ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
-ol.steps li{
-  counter-increment:s;position:relative;padding:0 0 22px 46px;margin:0;
-  border-left:1px solid var(--line);
-}
-ol.steps li:last-child{border-left-color:transparent;padding-bottom:0}
-ol.steps li::before{
-  content:counter(s);position:absolute;left:-15px;top:0;
-  width:29px;height:29px;border-radius:50%;background:var(--surface-2);
-  border:1px solid var(--line);color:var(--accent);
-  font-size:13px;font-weight:700;display:grid;place-items:center;
-}
-ol.steps b{display:block;margin-bottom:2px}
-ol.steps p{margin:0;color:var(--muted);font-size:14.5px}
+/* 区块 */
+section{padding:clamp(52px,7vw,88px) 0 0}
+.lead{display:grid;gap:8px;margin-bottom:30px}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:30px 44px}
+.feat div{display:grid;gap:6px;align-content:start}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:24px 44px}
+.nums dt{font-size:var(--display);font-weight:600;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.note{margin-top:26px;display:grid;gap:10px}
 
-/* 表格 */
-table{width:100%;border-collapse:collapse;font-size:14.5px}
-th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line)}
-th{color:var(--muted);font-weight:600;font-size:13px}
-td code{font-size:13px;color:var(--accent)}
-
-/* FAQ */
-details{border-bottom:1px solid var(--line);padding:16px 0}
-summary{cursor:pointer;font-weight:600;list-style:none}
+/* 折叠区 */
+.folds{margin-top:clamp(52px,7vw,88px);border-top:1px solid var(--line)}
+details.fold{border-bottom:1px solid var(--line)}
+details.fold>summary{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:22px 0;cursor:pointer;list-style:none}
 summary::-webkit-details-marker{display:none}
-summary::before{content:"+";color:var(--accent);margin-right:10px;font-weight:700}
-details[open] summary::before{content:"–"}
-details p{margin:10px 0 0;color:var(--muted);font-size:14.5px}
+details.fold>summary::after,.faq summary::after{content:"+";color:var(--muted);font-weight:400;transition:transform .3s var(--ease)}
+details[open]>summary::after{transform:rotate(45deg)}
+.foldbody{padding:0 0 34px;display:grid;gap:22px}
+ol.steps{list-style:none;padding:0;counter-reset:s;display:grid;gap:18px}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:2.2em 1fr;gap:2px 0}
+ol.steps li::before{content:counter(s);color:var(--muted);font-variant-numeric:tabular-nums;grid-row:span 2}
+ol.steps li>*{grid-column:2}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:440px}
+th,td{text-align:left;padding:11px 16px 11px 0;border-bottom:1px solid var(--line);font-weight:400}
+th{color:var(--muted)}
+tr:last-child td{border-bottom:0}
+kbd{font:inherit;font-variant-numeric:tabular-nums}
+ul.plain{list-style:none;padding:0;display:grid;gap:14px}
+ul.plain li{color:var(--muted)}
+ul.plain li>b:first-child{color:var(--ink);font-weight:600}
+ul.plain b{font-weight:400}
+.faq details{padding:14px 0;border-top:1px solid var(--line)}
+.faq details:first-child{border-top:0;padding-top:0}
+.faq summary{display:flex;justify-content:space-between;gap:20px;cursor:pointer;list-style:none}
+.faq p{margin-top:8px;color:var(--muted)}
 
-/* 限制 */
-.limits li{color:var(--muted);margin-bottom:9px;font-size:14.5px}
-.limits b{color:var(--text)}
+footer{padding:44px 0 72px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
+footer nav{display:flex;flex-wrap:wrap;gap:8px 22px}
 
-footer{padding:56px 0 72px;text-align:center;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
+/* 三档密度：A 极简 / B 中等 / C 完整 */
+[data-density="a"] .d-bc,[data-density="a"] .feat p,[data-density="b"] .d-c{display:none}
+
 
 @media(max-width:760px){
-  h1{font-size:34px}
-  .compare,.grid{grid-template-columns:1fr}
-  section{padding:54px 0}
+  .wrap{padding:0 20px}
+  .feat{grid-template-columns:1fr 1fr;gap:24px 28px}
+  .nums{grid-template-columns:1fr;gap:18px}
+  .tiles{grid-template-columns:1fr}
+  .tile.me,.ctl{display:none}
+  .capbody{height:10.5em}
+}
+@media(max-width:440px){.feat{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  html{scroll-behavior:auto}
 }
 </style>
 </head>
 <body>
 
-<a class="gh" href="https://github.com/yangli-0409/Awesome-Realtime-Translator"
-   target="_blank" rel="noopener" aria-label="在 GitHub 上查看源码" title="在 GitHub 上查看源码">
-  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
-      0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01
-      1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
-      0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0
-      1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0
-      3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01
-      8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-  </svg>
-</a>
-
-<a class="topbar" href="test/">
-  <span>🔍 面试之前，先用自测页确认一次：共享屏幕时字幕窗真的看不见</span>
-  <span class="topbar-go">打开自测页 →</span>
-</a>
-
-<header class="hero">
+<a class="check" href="test/">
   <div class="wrap">
-    <svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="面试字幕">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#2b3a4a"/><stop offset="1" stop-color="#121820"/>
-        </linearGradient>
-      </defs>
-      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#g)"
-            stroke="rgba(255,255,255,.14)" stroke-width="6"/>
-      <rect x="339" y="265" width="346" height="62" rx="31" fill="rgba(255,255,255,.28)"/>
-      <rect x="224" y="416" width="576" height="87" rx="43" fill="rgba(255,255,255,.92)"/>
-      <rect x="281" y="605" width="462" height="87" rx="43" fill="#3ddc97"/>
-    </svg>
-
-    <h1>面试字幕</h1>
-    <p class="lede">
-      抓取电脑正在播放的声音，在悬浮窗里显示<b>原文和中文翻译</b>。<br>
-      全程本机处理，不联网，不加入会议，对方看不到任何东西。
-    </p>
-
-    <div class="cta">
-      <a class="btn" href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a>
-      <a class="btn ghost" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 <span class="tagline">Beta</span></a>
-    </div>
-    <p class="meta">
-      macOS <b>v0.3.0</b> · 2026-11-24 · 需要 macOS 26 及以上 · Apple 芯片 / Intel 通用 · 0.9 MB<br>
-      Windows <b>v0.3.0 Beta</b> · 2026-11-24 · 需要 Windows 10 2004 及以上 · 64 位 · 389 MB
-    </p>
+    <span>面试之前，先用自测页确认一次：共享屏幕时字幕窗真的看不见</span>
+    <span>打开自测页 →</span>
   </div>
+</a>
+
+<div class="wrap">
+
+<header class="top">
+  <a class="brand" href="#top" id="top">
+    <svg viewBox="0 0 1024 1024" aria-hidden="true">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="#1b1a16"/>
+      <ellipse class="eye" cx="390" cy="512" rx="80" ry="124" fill="#fff"/>
+      <ellipse class="eye" cx="634" cy="512" rx="80" ry="124" fill="#fff"/>
+    </svg>
+    字幕宝<span class="tagline">面试实时字幕</span>
+  </a>
+  <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator" target="_blank" rel="noopener">GitHub</a>
 </header>
 
-<section>
-  <div class="wrap">
-    <h2>你看得见，对方看不见</h2>
-    <p class="sub">字幕窗不会出现在任何录屏和屏幕共享的画面里。不是「检测到你在共享就自动躲起来」，是它从一开始就录不进去——你共享整个桌面也一样。</p>
-
-    <div class="compare">
-      <div class="pane">
-        <span class="tag">你的屏幕</span>
-        <div class="screen">
-          <div class="face"><div class="dot"></div><span class="who">面试官</span></div>
-          <div class="wave m"></div><div class="wave s"></div><div class="wave m"></div>
-          <div class="cap">
-            <div class="src">What was the root cause and how did you find it?</div>
-            <div class="dst">根本原因是什么，你是怎么找到的？</div>
-          </div>
-        </div>
+<div class="hero">
+  <h1>实时听懂英文面试官<br><mark>共享屏幕时，对方看不到你的字幕</mark></h1>
+  <p class="muted measure">抓取电脑正在播放的声音，在悬浮窗里显示原文和中文翻译。全程本机处理，不联网，不加入会议，对方看不到任何东西。</p>
+  <div class="herorow">
+    <div class="dl">
+      <div class="cta">
+        <a class="btn mac" id="dl-mac" href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a>
+        <a class="btn win" id="dl-win" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 Beta</a>
       </div>
-      <div class="pane hidden-note">
-        <span class="tag">对方共享画面里看到的</span>
-        <div class="screen">
-          <div class="face"><div class="dot"></div><span class="who">面试官</span></div>
-          <div class="wave m"></div><div class="wave s"></div><div class="wave m"></div>
-          <div class="none">没有字幕窗</div>
-        </div>
+      <p class="muted">
+        macOS v0.3.0 · 2026-11-24 · 需要 macOS 26 及以上 · Apple 芯片 / Intel 通用 · 0.9 MB<br>
+        Windows v0.3.0 Beta · 2026-11-24 · 需要 Windows 10 2004 及以上 · 64 位 · 389 MB
+      </p>
+    </div>
+    <div class="seg" role="group" aria-label="切换画面">
+      <i></i>
+      <button type="button" data-v="mine" aria-pressed="true">你的屏幕</button>
+      <button type="button" data-v="theirs" aria-pressed="false">对方看到的</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="capslot">
+    <div class="ghost" aria-hidden="true">没有字幕窗</div>
+    <div class="cap" id="cap" aria-label="字幕窗演示">
+      <div class="caphead">
+        <span class="dot"></span><span>正在听</span><span class="sp"></span>
+        <svg class="on" viewBox="0 0 12 12"><rect x="2" y="1.5" width="3" height="9" rx=".8"/><rect x="7" y="1.5" width="3" height="9" rx=".8"/></svg>
+        <svg viewBox="0 0 12 12"><path d="M2.5 1h7A1.5 1.5 0 0 1 11 2.5v7A1.5 1.5 0 0 1 9.500 11h-7A1.500 1.500 0 0 1 1 9.500v-7A1.500 1.500 0 0 1 2.500 1Zm.7 2.400v1h5.600v-1Zm0 2.100v1h5.600v-1Zm0 2.100v1h3.600v-1Z"/></svg>
+        <svg viewBox="0 0 12 12"><path d="M6 0l1 1.700 1.900-.5.5 1.900L11.100 4l-.9 1.700.9 1.700-1.700 1-.5 1.900-1.900-.5L6 11.500l-1-1.700-1.900.5-.5-1.900L.900 7.400l.9-1.700L.900 4l1.700-.900.5-1.900 1.900.500Zm0 3.700a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg>
+        <svg viewBox="0 0 12 12"><path d="M5.300.500h1.400v5H5.300ZM3.600 2.100l.8 1.100a3.300 3.300 0 1 0 3.200 0l.8-1.100a4.700 4.700 0 1 1-4.800 0Z"/></svg>
+      </div>
+      <div class="pin">
+        <svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0Zm0 12.800a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4.300v.7H7V7.400c1.200-.3 1.900-.8 1.900-1.600 0-.6-.4-1-1-1s-1.100.4-1.200 1.100L4.800 5.500C5 4.100 6.200 3.100 7.900 3.100c1.800 0 3 1 3 2.600 0 1.300-.7 2.200-1.900 2.800Z"/></svg>
+        <div><div class="s" id="pin-s">Tell me about a time you had to debug a production issue.</div><div class="t" id="pin-t">讲讲你排查线上问题的一次经历。</div></div>
+      </div>
+      <div class="capbody" id="capbody">
+        <div class="ln"><div class="s">Thanks. Let's move on to a recent project.</div><div class="t">谢谢。我们接着聊你最近的一个项目。</div></div>
+        <div class="pend" id="pend"></div>
       </div>
     </div>
   </div>
-</section>
+  <div class="meet" id="meet" aria-hidden="true">
+    <div class="tiles">
+      <div class="tile">
+        <svg viewBox="0 0 100 70"><circle cx="50" cy="26" r="15"/><path d="M18 70c0-17 14-26 32-26s32 9 32 26Z"/></svg>
+        <div class="who"><span class="lv"><b></b><b></b><b></b></span>面试官</div>
+      </div>
+      <div class="tile me">
+        <svg viewBox="0 0 100 70"><circle cx="50" cy="26" r="15"/><path d="M18 70c0-17 14-26 32-26s32 9 32 26Z"/></svg>
+      </div>
+    </div>
+    <div class="ctl"><i></i><i></i><i></i></div>
+  </div>
+</div>
+<p class="muted measure d-bc after">字幕窗不会出现在任何录屏和屏幕共享的画面里。不是「检测到你在共享就自动躲起来」，是它从一开始就录不进去——你共享整个桌面也一样。</p>
 
 <section>
-  <div class="wrap">
+  <div class="lead">
     <h2>它做什么，不做什么</h2>
-    <p class="sub">产品边界只有一句话：<b>只帮你听懂，不替你回答。</b></p>
-
-    <div class="grid">
-      <div class="card">
-        <span class="pill">实时</span>
-        <h3>边听边出字</h3>
-        <p>原文一个词一个词往前推，整句说完才给译文。译文一旦出现就不再改写，不会在你眼前反复跳。
-          Windows 版 0.3.0 起译文也是逐字流出来的，不再整句一次性砸出来。</p>
-      </div>
-      <div class="card">
-        <span class="pill">本机</span>
-        <h3>全程不联网</h3>
-        <p>听写和翻译都用你这台 Mac 自己的能力完成。它<b>没有联网的能力</b>，断网也照样工作——这不是承诺，是它本来就做不到。</p>
-      </div>
-      <div class="card">
-        <span class="pill">不打扰</span>
-        <h3>不抢焦点，不占 Dock</h3>
-        <p>你在会议软件里打字不会被打断。没有 Dock 图标，可以开鼠标穿透当它不存在，别的应用全屏时它也还在最上层。</p>
-      </div>
-      <div class="card">
-        <span class="pill">不留痕</span>
-        <h3>不录音，不存文件</h3>
-        <p>声音听过就丢，任何时候都不写进硬盘。文字默认也不保存；真想留，可以一键复制或导出这一场的中英对照。</p>
-      </div>
-      <div class="card">
-        <span class="pill">可调</span>
-        <h3>看着顺眼为止</h3>
-        <p>三种显示模式（双语 / 只看原文 / 只看译文）、字号、透明度、显示行数、出字快慢，都在设置里拖滑块。</p>
-      </div>
-      <div class="card">
-        <span class="pill">克制</span>
-        <h3>不生成回答</h3>
-        <p>没有「建议答案」功能，以后也不会有。面试是你在面，它只负责让你听清对方说了什么。</p>
-      </div>
-    </div>
+    <p class="muted">产品边界只有一句话：只帮你听懂，不替你回答。</p>
+  </div>
+  <div class="feat">
+    <div><h3>边听边出字</h3><p class="muted">原文一个词一个词往前推，整句说完才给译文。译文一旦出现就不再改写，不会在你眼前反复跳。<span class="d-c"> Windows 版 0.3.0 起译文也是逐字流出来的，不再整句一次性砸出来。</span></p></div>
+    <div><h3>全程不联网</h3><p class="muted">听写和翻译都用你这台 Mac 自己的能力完成。它没有联网的能力，断网也照样工作——这不是承诺，是它本来就做不到。</p></div>
+    <div><h3>不抢焦点，不占 Dock</h3><p class="muted">你在会议软件里打字不会被打断。没有 Dock 图标，可以开鼠标穿透当它不存在，别的应用全屏时它也还在最上层。</p></div>
+    <div><h3>不录音，不存文件</h3><p class="muted">声音听过就丢，任何时候都不写进硬盘。文字默认也不保存；真想留，可以一键复制或导出这一场的中英对照。</p></div>
+    <div><h3>看着顺眼为止</h3><p class="muted">三种显示模式（双语 / 只看原文 / 只看译文）、字号、透明度、显示行数、出字快慢，都在设置里拖滑块。</p></div>
+    <div><h3>不生成回答</h3><p class="muted">没有「建议答案」功能，以后也不会有。面试是你在面，它只负责让你听清对方说了什么。</p></div>
   </div>
 </section>
 
 <section>
-  <div class="wrap">
+  <div class="lead">
     <h2>有多快</h2>
-    <p class="sub">不说「极速」「零延迟」这种话，给个你能对得上的数。</p>
-
-    <ul class="limits">
-      <li><b>原文落后对方约一秒。</b>他说到第五个词的时候，你大概看到第二三个词。</li>
-      <li><b>译文在他说完一句之后约半秒出现。</b>算下来，从他说完到你看懂，大约 <b>1.5 秒</b>。</li>
-      <li><b>这个速度是苹果的听写能力决定的</b>，不是软件偷懒，也不会因为换台更贵的 Mac 变快。</li>
-    </ul>
-    <p class="sub" style="margin:26px 0 0">
-      实际用起来的感受是：对方正常语速讲话时，字幕是连续往前流的，不会一段一段跳。
-      他讲完一句你低头看译文的那半秒，刚好是你准备开口的半秒。
-    </p>
+    <p class="muted d-bc">不说「极速」「零延迟」这种话，给个你能对得上的数。</p>
+  </div>
+  <dl class="nums">
+    <div><dt>约 1 秒</dt><dd class="muted">原文落后对方</dd></div>
+    <div><dt>约 0.5 秒</dt><dd class="muted">他说完一句之后，译文出现</dd></div>
+    <div><dt>约 1.5 秒</dt><dd class="muted">从他说完到你看懂</dd></div>
+  </dl>
+  <div class="note muted measure d-bc">
+    <p>这个速度是苹果的听写能力决定的，不是软件偷懒，也不会因为换台更贵的 Mac 变快。</p>
+    <p class="d-c">实际用起来的感受是：对方正常语速讲话时，字幕是连续往前流的，不会一段一段跳。他讲完一句你低头看译文的那半秒，刚好是你准备开口的半秒。</p>
   </div>
 </section>
 
-<section>
-  <div class="wrap">
-    <h2 id="install">安装</h2>
-    <p class="sub">大约两分钟。中间会让你重启一次应用，这是 macOS 的正常流程，不是出错了。</p>
+<div class="folds">
 
-    <ol class="steps">
-      <li>
-        <b>下载解压，拖进「应用程序」</b>
-      </li>
-      <li>
-        <b>第一次打开用右键</b>
-        <p>系统会说「无法验证开发者」，因为我没有买苹果的开发者证书。在「应用程序」里<b>右键点它 → 选「打开」</b>，再确认一次就好。只需要这么做一次。</p>
-      </li>
-      <li>
-        <b>允许「屏幕与系统音频录制」</b>
-        <p>macOS 把「听电脑正在放的声音」放在这一项权限底下，没有单独的选项可以给。它只拿声音，不截图、不录画面。</p>
-      </li>
-      <li>
-        <b>点「立即重启应用」</b>
-        <p>刚给的权限要重开一次才生效。引导页上有这个按钮，点一下就行。</p>
-      </li>
-      <li>
-        <b>完成</b>
-        <p>字幕窗出现在屏幕顶部中间，点左上角 ▶ 开始听。</p>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2>怎么用</h2>
-    <p class="sub">所有操作都在字幕窗自己的头部，不依赖菜单栏图标——它会被刘海挡住。</p>
-
-    <table>
-      <thead><tr><th>操作</th><th>位置</th><th>快捷键</th></tr></thead>
-      <tbody>
-        <tr><td>开始 / 暂停</td><td>字幕窗左上角 ▶</td><td><code>⌥⌘T</code></td></tr>
-        <tr><td>显示 / 隐藏字幕窗</td><td>—</td><td><code>⌥⌘H</code></td></tr>
-        <tr><td>设置</td><td>字幕窗右上角 ⚙</td><td><code>⌘,</code></td></tr>
-        <tr><td>退出</td><td>字幕窗右上角 ⏻</td><td>—</td></tr>
-        <tr><td>移动窗口</td><td>拖动字幕窗任意位置</td><td>—</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <h2 id="windows">Windows 版 0.3.0 <span class="tagline">Beta</span></h2>
-    <p class="sub">功能和 Mac 版一样。0.2.0 起，「字幕窗不出现在屏幕共享里」这条有自动化测试在真 Windows 上盯着了。仍然标 Beta，理由见下。</p>
-
-    <ul class="limits">
-      <li><b>有的功能。</b>听系统声音、边听边出字、整句翻译、字幕窗对屏幕共享隐藏、
-        不抢焦点、鼠标穿透、托盘、全局快捷键、设置、复制导出——Mac 版有的都有。</li>
-      <li><b>已经跑通的。</b>有用户在真 Windows 上用起来了：抓得到系统声音，
-        出得了字幕和译文。这是原先最大的两个未知项之一，现在过了。</li>
-      <li><b>0.3.0 修的：对方一直讲的时候，译文会停住不动。</b>同一位用户录了屏发回来，
-        实测译文能连续八秒一个字不动，英文在屏幕上堆到三行，然后两三句一起蹦出来。
-        原因是旧版只在对方停顿或窗口攒满 18 秒时才肯定稿一句，而真实会议里
-        对方根本不停。现在改成看到句号就定稿，而且<b>译文是逐字流出来的</b>，
-        不再整句一次性砸出来。顺带修掉了句子被切在半截上导致的烂译文。</li>
-      <li><b>隐藏这件事现在有机器守着了。</b>每次改代码，都会在一台真 Windows 上
-        把字幕窗显示出来、<b>真的截一次屏</b>，确认它不在截图里；同时跑一组对照——
-        先不隐藏截一次，必须找得到，找不到就说明那台机器截不到图、本次不作数。
-        这件事在 0.2.0 之前从来没有任何人、任何机器验证过。</li>
-      <li><b>为什么还叫 Beta。</b>上面验的是 Windows 自带的截屏方式。而
-        <b>Zoom、Teams、飞书的桌面客户端抓画面的方式不止一种，还没有人在真的会议软件里实测过。</b></li>
-      <li><b>所以第一次正式用之前还是自己确认一次。</b>用<a href="test/">自测页</a>看一眼对方收到的画面里
-        字幕窗在不在，一分钟的事。「以为对方看不到、其实看得到」是这个产品最严重的失败模式，这一步别省。</li>
-      <li><b>比 Mac 版大很多。</b>389 MB，因为 Windows 没有系统自带的语音识别和翻译，
-        模型得自己带。Mac 版 0.8 MB 是因为这两样 macOS 都有。</li>
-      <li><b>有一个地方反而更好。</b>Windows 版<b>不需要任何系统权限</b>，
-        双击就能用，也没有 Mac 那个「每次更新都要重新授权」的麻烦。</li>
-      <li><b>解压后整个文件夹别拆开。</b>模型和几个组件都得和主程序待在一起。
-        想要桌面快捷方式，右键主程序 → 发送到 → 桌面快捷方式。</li>
-      <li><b>Windows 会说「未知发布者」。</b>因为没有买代码签名证书。点「更多信息」
-        →「仍要运行」就行。极少数杀毒软件可能误报，不放心可以自己编译源码。</li>
-    </ul>
-
-    <div class="cta" style="justify-content:flex-start;margin:28px 0 0">
-      <a class="btn" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 Beta</a>
+  <details class="fold" data-open="bc" id="install">
+    <summary><h2>安装</h2></summary>
+    <div class="foldbody">
+      <p class="muted measure">大约两分钟。中间会让你重启一次应用，这是 macOS 的正常流程，不是出错了。</p>
+      <ol class="steps measure">
+        <li><h3>下载解压，拖进「应用程序」</h3></li>
+        <li><h3>第一次打开用右键</h3><p class="muted">系统会说「无法验证开发者」，因为我没有买苹果的开发者证书。在「应用程序」里右键点它 → 选「打开」，再确认一次就好。只需要这么做一次。</p></li>
+        <li><h3>允许「屏幕与系统音频录制」</h3><p class="muted">macOS 把「听电脑正在放的声音」放在这一项权限底下，没有单独的选项可以给。它只拿声音，不截图、不录画面。</p></li>
+        <li><h3>点「立即重启应用」</h3><p class="muted">刚给的权限要重开一次才生效。引导页上有这个按钮，点一下就行。</p></li>
+        <li><h3>完成</h3><p class="muted">字幕窗出现在屏幕顶部中间，点左上角 ▶ 开始听。</p></li>
+      </ol>
     </div>
-    <p class="meta" style="margin-top:12px">
-      v0.3.0 Beta · 2026-11-24 · 389 MB · 需要 Windows 10 2004 及以上 · 跑通了或者踩坑了，欢迎来
-      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/issues">开 issue</a> 告诉我
-    </p>
-  </div>
-</section>
+  </details>
 
-<section>
-  <div class="wrap">
-    <h2>已知限制</h2>
-    <p class="sub">这些是现在就知道的，写在这里省得你踩。</p>
-    <ul class="limits">
-      <li><b>只能装在 macOS 26 及以上。</b>它靠的是 macOS 26 才有的本机听写和翻译能力，旧系统装不上。</li>
-      <li><b>慢约 1.5 秒。</b>这是苹果听写能力的速度上限，换电脑也不会更快。</li>
-      <li><b>只听电脑放出来的声音，不听麦克风。</b>也就是说它听得到面试官，听不到你自己。这是故意的。</li>
-      <li><b>每次更新完要重新授权一次。</b>因为没有苹果开发者证书，系统会把新版本当成另一个应用。</li>
-      <li><b>只认真测过英语 → 中文。</b>法语、德语、日语、西班牙语在设置里能选，但我没实测过效果。</li>
-      <li><b>合规提示：</b>不同国家和地区对会议录音 / 转写的告知义务不同。本应用不录音、不保存音频，但文字转写是否需要告知对方，请你自行确认。</li>
-    </ul>
-  </div>
-</section>
+  <details class="fold" data-open="c">
+    <summary><h2>怎么用</h2></summary>
+    <div class="foldbody">
+      <p class="muted measure">所有操作都在字幕窗自己的头部，不依赖菜单栏图标——它会被刘海挡住。</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>操作</th><th>位置</th><th>快捷键</th></tr></thead>
+          <tbody>
+            <tr><td>开始 / 暂停</td><td>字幕窗左上角 ▶</td><td><kbd>⌥⌘T</kbd></td></tr>
+            <tr><td>显示 / 隐藏字幕窗</td><td>—</td><td><kbd>⌥⌘H</kbd></td></tr>
+            <tr><td>设置</td><td>字幕窗右上角 ⚙</td><td><kbd>⌘,</kbd></td></tr>
+            <tr><td>退出</td><td>字幕窗右上角 ⏻</td><td>—</td></tr>
+            <tr><td>移动窗口</td><td>拖动字幕窗任意位置</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>
 
-<section>
-  <div class="wrap">
-    <h2>常见问题</h2>
+  <details class="fold" data-open="c" id="windows">
+    <summary><h2>Windows 版 0.3.0 Beta</h2></summary>
+    <div class="foldbody">
+      <p class="muted measure">功能和 Mac 版一样。0.2.0 起，「字幕窗不出现在屏幕共享里」这条有自动化测试在真 Windows 上盯着了。仍然标 Beta，理由见下。</p>
+      <ul class="plain measure">
+        <li><b>有的功能。</b>听系统声音、边听边出字、整句翻译、字幕窗对屏幕共享隐藏、不抢焦点、鼠标穿透、托盘、全局快捷键、设置、复制导出——Mac 版有的都有。</li>
+        <li><b>已经跑通的。</b>有用户在真 Windows 上用起来了：抓得到系统声音，出得了字幕和译文。这是原先最大的两个未知项之一，现在过了。</li>
+        <li><b>0.3.0 修的：对方一直讲的时候，译文会停住不动。</b>同一位用户录了屏发回来，实测译文能连续八秒一个字不动，英文在屏幕上堆到三行，然后两三句一起蹦出来。原因是旧版只在对方停顿或窗口攒满 18 秒时才肯定稿一句，而真实会议里对方根本不停。现在改成看到句号就定稿，而且译文是逐字流出来的，不再整句一次性砸出来。顺带修掉了句子被切在半截上导致的烂译文。</li>
+        <li><b>隐藏这件事现在有机器守着了。</b>每次改代码，都会在一台真 Windows 上把字幕窗显示出来、真的截一次屏，确认它不在截图里；同时跑一组对照——先不隐藏截一次，必须找得到，找不到就说明那台机器截不到图、本次不作数。这件事在 0.2.0 之前从来没有任何人、任何机器验证过。</li>
+        <li><b>为什么还叫 Beta。</b>上面验的是 Windows 自带的截屏方式。而 Zoom、Teams、飞书的桌面客户端抓画面的方式不止一种，还没有人在真的会议软件里实测过。</li>
+        <li><b>所以第一次正式用之前还是自己确认一次。</b>用<a href="test/">自测页</a>看一眼对方收到的画面里字幕窗在不在，一分钟的事。「以为对方看不到、其实看得到」是这个产品最严重的失败模式，这一步别省。</li>
+        <li><b>比 Mac 版大很多。</b>389 MB，因为 Windows 没有系统自带的语音识别和翻译，模型得自己带。Mac 版 0.8 MB 是因为这两样 macOS 都有。</li>
+        <li><b>有一个地方反而更好。</b>Windows 版不需要任何系统权限，双击就能用，也没有 Mac 那个「每次更新都要重新授权」的麻烦。</li>
+        <li><b>解压后整个文件夹别拆开。</b>模型和几个组件都得和主程序待在一起。想要桌面快捷方式，右键主程序 → 发送到 → 桌面快捷方式。</li>
+        <li><b>Windows 会说「未知发布者」。</b>因为没有买代码签名证书。点「更多信息」→「仍要运行」就行。极少数杀毒软件可能误报，不放心可以自己编译源码。</li>
+      </ul>
+      <div class="cta" style="margin:0">
+        <a class="btn win" href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0 Beta</a>
+      </div>
+      <p class="muted">v0.3.0 Beta · 2026-11-24 · 389 MB · 需要 Windows 10 2004 及以上 · 跑通了或者踩坑了，欢迎来 <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/issues">开 issue</a> 告诉我</p>
+    </div>
+  </details>
 
-    <details>
-      <summary>为什么要「屏幕录制」权限？会不会偷看我的屏幕？</summary>
-      <p>macOS 把「听电脑正在放的声音」归在「屏幕与系统音频录制」这一项底下，没有单独的「系统声音」权限可以申请，所以只能要这一项。它只拿声音，画面直接扔掉，不截图也不录屏。</p>
-    </details>
+  <details class="fold" data-open="c">
+    <summary><h2>已知限制</h2></summary>
+    <div class="foldbody">
+      <p class="muted measure">这些是现在就知道的，写在这里省得你踩。</p>
+      <ul class="plain measure">
+        <li><b>只能装在 macOS 26 及以上。</b>它靠的是 macOS 26 才有的本机听写和翻译能力，旧系统装不上。</li>
+        <li><b>慢约 1.5 秒。</b>这是苹果听写能力的速度上限，换电脑也不会更快。</li>
+        <li><b>只听电脑放出来的声音，不听麦克风。</b>也就是说它听得到面试官，听不到你自己。这是故意的。</li>
+        <li><b>每次更新完要重新授权一次。</b>因为没有苹果开发者证书，系统会把新版本当成另一个应用。</li>
+        <li><b>只认真测过英语 → 中文。</b>法语、德语、日语、西班牙语在设置里能选，但我没实测过效果。</li>
+        <li><b>合规提示：</b>不同国家和地区对会议录音 / 转写的告知义务不同。本应用不录音、不保存音频，但文字转写是否需要告知对方，请你自行确认。</li>
+      </ul>
+    </div>
+  </details>
 
-    <details>
-      <summary>对方真的看不到吗？</summary>
-      <p>看不到。字幕窗被设成对所有录屏和屏幕共享都不可见，连你自己录屏都录不到它。不过第一次用之前，建议你先用会议软件的共享预览自己看一眼——少数软件直接抓屏幕原始画面，不守这个规矩。</p>
-    </details>
+  <details class="fold" data-open="c">
+    <summary><h2>常见问题</h2></summary>
+    <div class="foldbody faq measure" style="gap:0">
+      <details><summary>为什么要「屏幕录制」权限？会不会偷看我的屏幕？</summary><p>macOS 把「听电脑正在放的声音」归在「屏幕与系统音频录制」这一项底下，没有单独的「系统声音」权限可以申请，所以只能要这一项。它只拿声音，画面直接扔掉，不截图也不录屏。</p></details>
+      <details><summary>对方真的看不到吗？</summary><p>看不到。字幕窗被设成对所有录屏和屏幕共享都不可见，连你自己录屏都录不到它。不过第一次用之前，建议你先用会议软件的共享预览自己看一眼——少数软件直接抓屏幕原始画面，不守这个规矩。</p></details>
+      <details><summary>它会把我的面试内容传到云端吗？</summary><p>不会，而且不是「承诺不传」——它根本没有联网的能力，连不上任何服务器。你可以拔掉网线试试，功能完全不受影响。</p></details>
+      <details><summary>为什么译文是一整句出现，原文却是一个词一个词出现的？</summary><p>故意这么做的。中文和英文语序不一样，边听边翻的话译文会被反复改写，整行字乱跳，比多等一秒难受得多。所以只有一句话说完了才翻，翻出来就不再改。</p></details>
+      <details><summary>能帮我生成回答吗？</summary><p>不能，以后也不会做。它只帮你听懂，不替你回答。</p></details>
+      <details><summary>会不会很耗电？</summary><p>听写和翻译都跑在 Apple 芯片自己的加速单元上，比那些把声音传上云的方案省电。但我还没测过连续一小时的耗电和发热，这点先别当成已验证的结论。</p></details>
+      <details><summary>可以用在上课、看视频、听播客上吗？</summary><p>可以。它不认得「这是面试」，只要是你电脑里放出来的声音，它都能听。只是所有的设计取舍都是围绕面试做的：低调、不留痕、不抢焦点。</p></details>
+    </div>
+  </details>
 
-    <details>
-      <summary>它会把我的面试内容传到云端吗？</summary>
-      <p>不会，而且不是「承诺不传」——它根本没有联网的能力，连不上任何服务器。你可以拔掉网线试试，功能完全不受影响。</p>
-    </details>
-
-    <details>
-      <summary>为什么译文是一整句出现，原文却是一个词一个词出现的？</summary>
-      <p>故意这么做的。中文和英文语序不一样，边听边翻的话译文会被反复改写，整行字乱跳，比多等一秒难受得多。所以只有一句话说完了才翻，翻出来就不再改。</p>
-    </details>
-
-    <details>
-      <summary>能帮我生成回答吗？</summary>
-      <p>不能，以后也不会做。它只帮你听懂，不替你回答。</p>
-    </details>
-
-    <details>
-      <summary>会不会很耗电？</summary>
-      <p>听写和翻译都跑在 Apple 芯片自己的加速单元上，比那些把声音传上云的方案省电。但我还没测过连续一小时的耗电和发热，这点先别当成已验证的结论。</p>
-    </details>
-
-    <details>
-      <summary>可以用在上课、看视频、听播客上吗？</summary>
-      <p>可以。它不认得「这是面试」，只要是你电脑里放出来的声音，它都能听。只是所有的设计取舍都是围绕面试做的：低调、不留痕、不抢焦点。</p>
-    </details>
-  </div>
-</section>
+</div>
 
 <footer>
-  <div class="wrap">
-    <p>免费 · MIT 开源 · macOS v0.3.0 · <a href="#windows">Windows v0.3.0 Beta</a></p>
-    <p>
-      <a href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a> ·
-      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0</a> ·
-      <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator">GitHub</a>
-    </p>
-  </div>
+  <span>免费 · MIT 开源 · macOS v0.3.0 · Windows v0.3.0 Beta</span>
+  <nav>
+    <a href="AwesomeRealtimeTranslator-0.3.0.zip">下载 macOS 版 0.3.0</a>
+    <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator/releases/tag/v0.3.0-windows-beta">下载 Windows 版 0.3.0</a>
+    <a href="https://github.com/yangli-0409/Awesome-Realtime-Translator">GitHub</a>
+  </nav>
 </footer>
 
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+
+  /* Windows 访客：Windows 版排在前面，两个按钮一样重 */
+  if(/Windows/.test(navigator.userAgent)){
+    $('dl-win').parentNode.insertBefore($('dl-win'),$('dl-mac'));
+  }
+
+  /* 你的屏幕 / 对方看到的 */
+  var segBtns=document.querySelectorAll('.seg button');
+  segBtns.forEach(function(b){b.onclick=function(){
+    var v=b.dataset.v; document.documentElement.dataset.view=v;
+    segBtns.forEach(function(x){x.setAttribute('aria-pressed',x.dataset.v===v)});
+  }});
+
+  /* 字幕演示：照 app 的节奏走。约 950ms 到一批词，匀速摊开；整句说完约半秒后译文一次到位，不再改写。 */
+  var S=[
+    {en:"What was the root cause and how did you find it?",zh:"根本原因是什么，你是怎么找到的？",q:1},
+    {en:"Take your time.",zh:"不着急，慢慢说。"},
+    {en:"Thanks. Let's move on to a recent project.",zh:"谢谢。我们接着聊你最近的一个项目。"},
+    {en:"Tell me about a time you had to debug a production issue.",zh:"讲讲你排查线上问题的一次经历。",q:1}
+  ];
+  var body=$('capbody'),pend=$('pend'),meet=$('meet');
+  var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
+  var frame=function(){return new Promise(function(r){requestAnimationFrame(r)})};
+  var batches=[3,2,4,3];
+
+  function addLine(en){
+    var ln=document.createElement('div'); ln.className='ln';
+    var s=document.createElement('div'); s.className='s'; s.textContent=en;
+    var t=document.createElement('div'); t.className='t wait'; t.textContent='…';
+    ln.appendChild(s); ln.appendChild(t); body.insertBefore(ln,pend);
+    var all=body.querySelectorAll('.ln');
+    for(var i=0;i<all.length-1;i++) all[i].remove();
+    return t;
+  }
+
+  async function say(s,k){
+    var words=s.en.split(' '),target='',done=false,prog=0,last=performance.now();
+    meet.classList.add('speaking');
+    var reveal=(async function(){
+      while(!(done&&prog>=target.length)){
+        await frame();
+        var now=performance.now(),dt=Math.min(.1,(now-last)/1000); last=now;
+        var back=target.length-prog;
+        if(back>0){
+          prog=Math.min(target.length,prog+Math.min(120,Math.max(8,back/.5))*dt);
+          pend.textContent=target.slice(0,Math.floor(prog));
+        }
+      }
+    })();
+    for(var i=0,b=k;i<words.length;b++){
+      i+=batches[b%batches.length];
+      target=words.slice(0,i).join(' ');
+      await sleep(950);
+    }
+    done=true; meet.classList.remove('speaking');
+    await reveal;
+    pend.textContent='';
+    if(s.q){
+      $('pin-s').textContent=s.en; $('pin-t').textContent='…'; $('pin-t').classList.add('wait');
+      await sleep(500);
+      $('pin-t').textContent=s.zh; $('pin-t').classList.remove('wait');
+    }else{
+      var t=addLine(s.en);
+      await sleep(500);
+      t.textContent=s.zh; t.classList.remove('wait');
+    }
+  }
+
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    (async function(){
+      await sleep(1600);
+      for(var k=0;;k++){ await say(S[k%S.length],k); await sleep(1500); }
+    })();
+  }
+
+  /* 密度：决定哪些折叠区默认展开 */
+  function density(d){
+    document.documentElement.dataset.density=d;
+    document.querySelectorAll('details.fold').forEach(function(f){f.open=f.dataset.open.indexOf(d)>-1});
+  }
+  density(document.documentElement.dataset.density);
+
+})();
+</script>
 </body>
 </html>
